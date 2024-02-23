@@ -25,27 +25,30 @@
         color="primary"
         :disabled="numberOfRolls === 3"
       >
-        Roll all dice
+        Roll the dice
       </v-btn>
       <v-chip>{{ numberOfRolls }}</v-chip>
     </div>
 
     <!-- Dice -->
-    <div class="d-flex">
-      <div
-        v-for="(die, i) in dice"
-        :key="die"
+    <div class="d-flex justify-center">
+      <!-- @click="rollTheDice(i)" -->
+
+      <v-chip-group
+        v-model="selectedDice"
+        multiple
       >
-        <v-btn
+        <v-chip
+          v-for="(die, i) in dice"
+          :key="i"
           class="mr-4"
-          @click="rollTheDice(i)"
-          variant="outlined"
           color="primary"
+          label
           :disabled="numberOfRolls === 3"
         >
           {{ die }}
-        </v-btn>
-      </div>
+        </v-chip>
+      </v-chip-group>
     </div>
 
     <!-- Score sheets -->
@@ -72,6 +75,8 @@ const numberOfRolls = ref(0);
 
 const dice = [ref(0), ref(0), ref(0), ref(0), ref(0)];
 
+const selectedDice = ref([]);
+
 const total = ref(0);
 
 // when number of rolls is 3, switch to next player
@@ -80,6 +85,7 @@ const onSwitchPlayer = () => {
   dice.forEach((die) => (die.value = 0));
   numberOfRolls.value = 0;
   total.value = 0;
+  selectedDice.value = [];
 
   const nextPlayer = players.value.find(
     (player) => player.name !== currentPlayer.value.name
@@ -98,17 +104,20 @@ const onSwitchPlayer = () => {
 };
 
 const rollAllDice = () => {
-  dice.forEach((die) => {
-    die.value = Math.floor(Math.random() * 6) + 1;
-  });
-  numberOfRolls.value++;
-  countTotal();
-};
+  // if first roll throw all dice
+  if (numberOfRolls.value === 0) {
+    dice.forEach((die) => {
+      die.value = Math.floor(Math.random() * 6) + 1;
+    });
+  } else {
+    selectedDice.value.forEach((i) => {
+      dice[i].value = Math.floor(Math.random() * 6) + 1;
+    });
+  }
 
-const rollTheDice = (i) => {
-  dice[i].value = Math.floor(Math.random() * 6) + 1;
   numberOfRolls.value++;
   countTotal();
+  selectedDice.value = [];
 };
 
 const countTotal = () => {
