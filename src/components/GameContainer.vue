@@ -1,14 +1,19 @@
 <template>
   <div class="game-container">
-    <v-btn class="mb-4">Roll all dice</v-btn>
+    <v-btn
+      class="mb-8"
+      @click="rollAllDice"
+    >
+      Roll all dice
+    </v-btn>
     <div class="d-flex">
       <div
-        v-for="die in dice"
+        v-for="(die, i) in dice"
         :key="die"
       >
         <v-btn
           class="mr-4"
-          @click="rollTheDice"
+          @click="rollTheDice(i)"
         >
           {{ die }}
         </v-btn>
@@ -22,10 +27,14 @@ import { ref } from "vue";
 
 const dice = [ref(0), ref(0), ref(0), ref(0), ref(0), ref(0)];
 
-const rollTheDice = () => {
+const rollAllDice = () => {
   dice.forEach((die) => {
     die.value = Math.floor(Math.random() * 6) + 1;
   });
+};
+
+const rollTheDice = (i) => {
+  dice[i].value = Math.floor(Math.random() * 6) + 1;
 };
 </script>
 

@@ -1,23 +1,26 @@
 <template>
-  <v-app>
-    <v-main>
-      <GameContainer />
-    </v-main>
-  </v-app>
+  <GameContainer />
 </template>
 
-<script>
+<script lang="ts">
+import { Options, Vue } from "vue-class-component";
 import GameContainer from "./components/GameContainer.vue";
 
-export default {
-  name: "App",
-
+@Options({
   components: {
     GameContainer,
   },
-
-  data: () => ({
-    //
-  }),
-};
+})
+export default class App extends Vue {}
 </script>
+
+<style>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+</style>
