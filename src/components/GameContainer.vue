@@ -49,53 +49,17 @@
     </div>
 
     <!-- Score sheets -->
-    <div class="d-flex mt-8">
-      <v-card
-        v-for="playerAndScore in playersAndScores"
-        :key="playerAndScore.name"
-        class="mr-4"
-        width="200"
-      >
-        <v-card-text>
-          <div>
-            <div class="mb-8">{{ playerAndScore.name }}</div>
-            <div class="d-flex align-center justify-space-between mb-2">
-              <div>Ones</div>
-              <v-btn
-                v-if="!playerAndScore.scores.ones"
-                @click="saveScore('ones')"
-              >
-                ADD
-              </v-btn>
-              <div
-                v-else
-                class="displayed-score d-flex align-center justify-center"
-              >
-                {{ playerAndScore.scores.ones }}
-              </div>
-            </div>
-            <div class="d-flex align-center justify-space-between mb-2">
-              <div>Twos</div>
-              <v-btn
-                v-if="!playerAndScore.scores.twos"
-                @click="saveScore('twos')"
-              ></v-btn>
-              <div
-                v-else
-                class="displayed-score d-flex align-center justify-center"
-              >
-                {{ playerAndScore.scores.twos }}
-              </div>
-            </div>
-          </div>
-        </v-card-text>
-      </v-card>
-    </div>
+    <ScoreCardsContainer
+      :currentPlayer="currentPlayer"
+      :totalScore="total"
+      @swithPlayer="onSwitchPlayer"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
+import ScoreCardsContainer from "./ScoreCardsContainer.vue";
 
 const players = ref([
   { name: "Player 1", turn: true },
@@ -108,37 +72,14 @@ const numberOfRolls = ref(0);
 
 const dice = [ref(0), ref(0), ref(0), ref(0), ref(0)];
 
-// create a table of players and their scores
-const playersAndScores = ref([
-  {
-    name: "Player 1",
-    scores: {
-      ones: null,
-      twos: null,
-      threes: null,
-      fours: null,
-      fives: null,
-      sixes: null,
-    },
-  },
-  {
-    name: "Player 2",
-    scores: {
-      ones: null,
-      twos: null,
-      threes: null,
-      fours: null,
-      fives: null,
-      sixes: null,
-    },
-  },
-]);
+const total = ref(0);
 
 // when number of rolls is 3, switch to next player
-const switchPlayer = () => {
+const onSwitchPlayer = () => {
   // reset dice and number of rolls
   dice.forEach((die) => (die.value = 0));
   numberOfRolls.value = 0;
+  total.value = 0;
 
   const nextPlayer = players.value.find(
     (player) => player.name !== currentPlayer.value.name
@@ -161,31 +102,18 @@ const rollAllDice = () => {
     die.value = Math.floor(Math.random() * 6) + 1;
   });
   numberOfRolls.value++;
+  countTotal();
 };
 
 const rollTheDice = (i) => {
   dice[i].value = Math.floor(Math.random() * 6) + 1;
   numberOfRolls.value++;
+  countTotal();
 };
 
-// save the score of the current player
-const saveScore = (selectedOption) => {
-  // count the total of all dice
-  const total = dice.reduce((acc, die) => acc + die.value, 0);
-
-  // find the player in the playersAndScores array
-  const currentPlayerAndScore = playersAndScores.value.find(
-    (playerAndScore) => playerAndScore.name === currentPlayer.value.name
-  );
-
-  // update the score of the current player. the selected score saving option is the key of the score object
-  currentPlayerAndScore.scores[selectedOption.toLowerCase()] = total;
-
-  // if score is saved, switch to next player
-  switchPlayer();
+const countTotal = () => {
+  total.value = dice.reduce((acc, die) => acc + die.value, 0);
 };
-
-// remember to clean up the watcher
 </script>
 
 <style scoped>
