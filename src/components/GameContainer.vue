@@ -1,14 +1,18 @@
 <template>
-  <div>
-    <div
-      v-for="die in dice"
-      :key="die"
-    >
-      <v-btn color="red">foo</v-btn>
-      <button @click="rollTheDice">
-        {{ die }}
-      </button>
-      <v-btn color="primary">Primary Button</v-btn>
+  <div class="game-container">
+    <v-btn class="mb-4">Roll all dice</v-btn>
+    <div class="d-flex">
+      <div
+        v-for="die in dice"
+        :key="die"
+      >
+        <v-btn
+          class="mr-4"
+          @click="rollTheDice"
+        >
+          {{ die }}
+        </v-btn>
+      </div>
     </div>
   </div>
 </template>
@@ -25,4 +29,11 @@ const rollTheDice = () => {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.game-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 50px;
+}
+</style>
