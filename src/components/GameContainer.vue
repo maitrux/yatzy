@@ -21,15 +21,13 @@
       <v-btn
         class="mr-4"
         @click="rollAllDice"
+        flat
+        color="primary"
+        :disabled="numberOfRolls === 3"
       >
         Roll all dice
       </v-btn>
-      <v-select
-        v-model="selectedScoreSavingOption"
-        :items="scoreSavingOptions"
-        density="comfortable"
-        hide-details
-      ></v-select>
+      <v-chip>{{ numberOfRolls }}</v-chip>
     </div>
 
     <!-- Dice -->
@@ -41,6 +39,9 @@
         <v-btn
           class="mr-4"
           @click="rollTheDice(i)"
+          variant="outlined"
+          color="primary"
+          :disabled="numberOfRolls === 3"
         >
           {{ die }}
         </v-btn>
@@ -58,29 +59,33 @@
         <v-card-text>
           <div>
             <div class="mb-8">{{ playerAndScore.name }}</div>
-            <div class="d-flex justify-space-between mb-2">
+            <div class="d-flex align-center justify-space-between mb-2">
               <div>Ones</div>
-              <div>{{ playerAndScore.scores[0].ones }}</div>
+              <v-btn
+                v-if="!playerAndScore.scores.ones"
+                @click="saveScore('ones')"
+              >
+                ADD
+              </v-btn>
+              <div
+                v-else
+                class="displayed-score d-flex align-center justify-center"
+              >
+                {{ playerAndScore.scores.ones }}
+              </div>
             </div>
-            <div class="d-flex justify-space-between mb-2">
+            <div class="d-flex align-center justify-space-between mb-2">
               <div>Twos</div>
-              <div>{{ playerAndScore.scores[0].twos }}</div>
-            </div>
-            <div class="d-flex justify-space-between mb-2">
-              <div>Threes</div>
-              <div>{{ playerAndScore.scores[0].threes }}</div>
-            </div>
-            <div class="d-flex justify-space-between mb-2">
-              <div>Fours</div>
-              <div>{{ playerAndScore.scores[0].fours }}</div>
-            </div>
-            <div class="d-flex justify-space-between mb-2">
-              <div>Fives</div>
-              <div>{{ playerAndScore.scores[0].fives }}</div>
-            </div>
-            <div class="d-flex justify-space-between mb-2">
-              <div>Sixes</div>
-              <div>{{ playerAndScore.scores[0].sixes }}</div>
+              <v-btn
+                v-if="!playerAndScore.scores.twos"
+                @click="saveScore('twos')"
+              ></v-btn>
+              <div
+                v-else
+                class="displayed-score d-flex align-center justify-center"
+              >
+                {{ playerAndScore.scores.twos }}
+              </div>
             </div>
           </div>
         </v-card-text>
@@ -90,7 +95,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref } from "vue";
 
 const players = ref([
   { name: "Player 1", turn: true },
@@ -101,48 +106,54 @@ const currentPlayer = ref(players.value[0]);
 
 const numberOfRolls = ref(0);
 
-const dice = [ref(0), ref(0), ref(0), ref(0), ref(0), ref(0)];
-
-const selectedScoreSavingOption = ref("Save score");
+const dice = [ref(0), ref(0), ref(0), ref(0), ref(0)];
 
 // create a table of players and their scores
 const playersAndScores = ref([
   {
     name: "Player 1",
-    scores: [{ ones: 0, twos: 0, threes: 0, fours: 0, fives: 0, sixes: 0 }],
+    scores: {
+      ones: null,
+      twos: null,
+      threes: null,
+      fours: null,
+      fives: null,
+      sixes: null,
+    },
   },
   {
     name: "Player 2",
-    scores: [{ ones: 0, twos: 0, threes: 0, fours: 0, fives: 0, sixes: 0 }],
+    scores: {
+      ones: null,
+      twos: null,
+      threes: null,
+      fours: null,
+      fives: null,
+      sixes: null,
+    },
   },
 ]);
 
-const scoreSavingOptions = [
-  "Ones",
-  "Twos",
-  "Threes",
-  "Fours",
-  "Fives",
-  "Sixes",
-];
-
 // when number of rolls is 3, switch to next player
-const switchPlayer = (forceSwitch) => {
-  if (numberOfRolls.value === 3 || forceSwitch) {
-    const nextPlayer = players.value.find(
-      (player) => player.name !== currentPlayer.value.name
-    );
-    currentPlayer.value = nextPlayer;
-    numberOfRolls.value = 0;
+const switchPlayer = () => {
+  // reset dice and number of rolls
+  dice.forEach((die) => (die.value = 0));
+  numberOfRolls.value = 0;
 
-    // switch turn to next player
-    currentPlayer.value.turn = true;
-    players.value.forEach((player) => {
-      if (player.name !== currentPlayer.value.name) {
-        player.turn = false;
-      }
-    });
-  }
+  const nextPlayer = players.value.find(
+    (player) => player.name !== currentPlayer.value.name
+  );
+
+  currentPlayer.value = nextPlayer;
+  numberOfRolls.value = 0;
+
+  // switch turn to next player
+  currentPlayer.value.turn = true;
+  players.value.forEach((player) => {
+    if (player.name !== currentPlayer.value.name) {
+      player.turn = false;
+    }
+  });
 };
 
 const rollAllDice = () => {
@@ -150,21 +161,15 @@ const rollAllDice = () => {
     die.value = Math.floor(Math.random() * 6) + 1;
   });
   numberOfRolls.value++;
-  switchPlayer();
 };
 
 const rollTheDice = (i) => {
   dice[i].value = Math.floor(Math.random() * 6) + 1;
   numberOfRolls.value++;
-  switchPlayer();
 };
 
 // save the score of the current player
-watch(selectedScoreSavingOption, (selectedOption) => {
-  if (selectedOption === "Save score") {
-    return;
-  }
-
+const saveScore = (selectedOption) => {
   // count the total of all dice
   const total = dice.reduce((acc, die) => acc + die.value, 0);
 
@@ -174,11 +179,11 @@ watch(selectedScoreSavingOption, (selectedOption) => {
   );
 
   // update the score of the current player. the selected score saving option is the key of the score object
-  currentPlayerAndScore.scores[0][selectedOption.toLowerCase()] = total;
+  currentPlayerAndScore.scores[selectedOption.toLowerCase()] = total;
 
   // if score is saved, switch to next player
-  switchPlayer(true);
-});
+  switchPlayer();
+};
 
 // remember to clean up the watcher
 </script>
@@ -203,7 +208,8 @@ watch(selectedScoreSavingOption, (selectedOption) => {
   margin-bottom: 8px;
 }
 
-.score-column {
-  align-items: flex-end;
+.displayed-score {
+  text-align: center;
+  height: 36px;
 }
 </style>
