@@ -90,7 +90,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 
 const players = ref([
   { name: "Player 1", turn: true },
@@ -127,8 +127,8 @@ const scoreSavingOptions = [
 ];
 
 // when number of rolls is 3, switch to next player
-const switchPlayer = () => {
-  if (numberOfRolls.value === 3) {
+const switchPlayer = (forceSwitch) => {
+  if (numberOfRolls.value === 3 || forceSwitch) {
     const nextPlayer = players.value.find(
       (player) => player.name !== currentPlayer.value.name
     );
@@ -158,6 +158,29 @@ const rollTheDice = (i) => {
   numberOfRolls.value++;
   switchPlayer();
 };
+
+// save the score of the current player
+watch(selectedScoreSavingOption, (selectedOption) => {
+  if (selectedOption === "Save score") {
+    return;
+  }
+
+  // count the total of all dice
+  const total = dice.reduce((acc, die) => acc + die.value, 0);
+
+  // find the player in the playersAndScores array
+  const currentPlayerAndScore = playersAndScores.value.find(
+    (playerAndScore) => playerAndScore.name === currentPlayer.value.name
+  );
+
+  // update the score of the current player. the selected score saving option is the key of the score object
+  currentPlayerAndScore.scores[0][selectedOption.toLowerCase()] = total;
+
+  // if score is saved, switch to next player
+  switchPlayer(true);
+});
+
+// remember to clean up the watcher
 </script>
 
 <style scoped>
