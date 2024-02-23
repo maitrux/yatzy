@@ -10,17 +10,22 @@
       <v-card-text>
         <div>
           <div class="mb-8">{{ playerAndScore.name }}</div>
-          <div class="d-flex align-center justify-space-between mb-2">
-            <div>Ones</div>
+          <!-- Loop through each score option -->
+          <div
+            v-for="(score, option) in playerAndScore.scores"
+            :key="option"
+            class="d-flex align-center justify-space-between mb-2"
+          >
+            <div>{{ option.charAt(0).toUpperCase() + option.slice(1) }}</div>
             <v-btn
-              v-if="!playerAndScore.scores.ones"
-              @click="saveScore('ones')"
+              v-if="!score"
               flat
               color="primary"
               :disabled="
                 playerAndScore.name !== props.currentPlayer.name ||
                 totalScore === 0
               "
+              @click="saveScore(option)"
             >
               ADD
             </v-btn>
@@ -28,28 +33,7 @@
               v-else
               class="displayed-score d-flex align-center justify-center"
             >
-              {{ playerAndScore.scores.ones }}
-            </div>
-          </div>
-          <div class="d-flex align-center justify-space-between mb-2">
-            <div>Twos</div>
-            <v-btn
-              v-if="!playerAndScore.scores.twos"
-              @click="saveScore('twos')"
-              flat
-              color="primary"
-              :disabled="
-                playerAndScore.name !== props.currentPlayer.name ||
-                totalScore === 0
-              "
-            >
-              ADD
-            </v-btn>
-            <div
-              v-else
-              class="displayed-score d-flex align-center justify-center"
-            >
-              {{ playerAndScore.scores.twos }}
+              {{ score }}
             </div>
           </div>
         </div>
