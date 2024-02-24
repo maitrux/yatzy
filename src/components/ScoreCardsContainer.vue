@@ -48,6 +48,7 @@ import { ref, defineProps, defineEmits } from "vue";
 const props = defineProps({
   currentPlayer: Object,
   totalScore: Number,
+  dice: Array,
 });
 
 const emit = defineEmits(["swithPlayer"]);
@@ -77,14 +78,36 @@ const playersAndScores = ref([
   },
 ]);
 
+const mapSelectedOptionToNumber = {
+  ones: 1,
+  twos: 2,
+  threes: 3,
+  fours: 4,
+  fives: 5,
+  sixes: 6,
+};
+
 const saveScore = (selectedOption) => {
   // find the player in the playersAndScores array
   const currentPlayerAndScore = playersAndScores.value.find(
     (playerAndScore) => playerAndScore.name === props.currentPlayer.name
   );
 
+  // the score will be the sum of thse dice that match the selected score option
+  let multiplier = 0;
+
+  const selectedOptionAsNumber =
+    mapSelectedOptionToNumber[selectedOption.toLowerCase()];
+
+  props.dice.forEach((die) => {
+    if (die.value === selectedOptionAsNumber) {
+      multiplier++;
+    }
+  });
+
   // update the score of the current player. the selected score saving option is the key of the score object
-  currentPlayerAndScore.scores[selectedOption.toLowerCase()] = props.totalScore;
+  currentPlayerAndScore.scores[selectedOption.toLowerCase()] =
+    multiplier * selectedOptionAsNumber;
 
   emit("swithPlayer");
 };

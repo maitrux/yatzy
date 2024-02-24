@@ -55,6 +55,7 @@
     <ScoreCardsContainer
       :currentPlayer="currentPlayer"
       :totalScore="total"
+      :dice="dice"
       @swithPlayer="onSwitchPlayer"
     />
   </div>
@@ -82,7 +83,7 @@ const total = ref(0);
 // when number of rolls is 3, switch to next player
 const onSwitchPlayer = () => {
   // reset dice and number of rolls
-  dice.forEach((die) => (die.value = 0));
+  // dice.forEach((die) => (die.value = 0));
   numberOfRolls.value = 0;
   total.value = 0;
   selectedDice.value = [];
