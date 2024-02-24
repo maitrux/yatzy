@@ -39,13 +39,26 @@
         </div>
 
         <v-btn
-          class="mt-8"
+          class="mt-4"
           color="primary"
           @click="countTotal(playerAndScore)"
         >
           Count total
         </v-btn>
-        <div>Total: {{ playerAndScore.total }}</div>
+        <div class="mt-4">
+          <div class="d-flex align-center justify-space-between">
+            <div>Bonus</div>
+            <div class="displayed-score d-flex align-center justify-center">
+              {{ playerAndScore.bonus }}
+            </div>
+          </div>
+          <div class="d-flex align-center justify-space-between">
+            <div>Total</div>
+            <div class="displayed-score d-flex align-center justify-center">
+              {{ playerAndScore.total }}
+            </div>
+          </div>
+        </div>
       </v-card-text>
     </v-card>
   </div>
@@ -63,25 +76,26 @@ const props = defineProps({
 const emit = defineEmits(["swithPlayer"]);
 
 const playersAndScores = ref([
-  {
-    name: props.currentPlayer.name,
-    scores: {
-      ones: null,
-      twos: null,
-      threes: null,
-      fours: null,
-      fives: null,
-      sixes: null,
-      threeOfAKind: null,
-      fourOfAKind: null,
-      smallStraight: null,
-      largeStraight: null,
-      fullHouse: null,
-      chance: null,
-      yatzy: null,
-    },
-    total: 0,
-  },
+  // {
+  //   name: "Player 1",
+  //   scores: {
+  //     ones: null,
+  //     twos: null,
+  //     threes: null,
+  //     fours: null,
+  //     fives: null,
+  //     sixes: null,
+  //     threeOfAKind: null,
+  //     fourOfAKind: null,
+  //     smallStraight: null,
+  //     largeStraight: null,
+  //     fullHouse: null,
+  //     chance: null,
+  //     yatzy: null,
+  //   },
+  //   bonus: 0,
+  //   total: 0,
+  // },
   {
     name: "Player 2",
     scores: {
@@ -99,6 +113,27 @@ const playersAndScores = ref([
       chance: null,
       yatzy: null,
     },
+    bonus: 0,
+    total: 0,
+  },
+  {
+    name: "Player 1",
+    scores: {
+      ones: 3,
+      twos: 12,
+      threes: 9,
+      fours: 16,
+      fives: 15,
+      sixes: 18,
+      threeOfAKind: null,
+      fourOfAKind: null,
+      smallStraight: null,
+      largeStraight: null,
+      fullHouse: null,
+      chance: null,
+      yatzy: null,
+    },
+    bonus: 0,
     total: 0,
   },
 ]);
@@ -281,6 +316,20 @@ const countTotal = (playerAndScore) => {
   for (const score in playerAndScore.scores) {
     if (playerAndScore.scores[score] !== null) {
       total += playerAndScore.scores[score];
+    }
+  }
+
+  // check if the total of const numberOptions = ["ones", "twos", "threes", "fours", "fives", "sixes"] is greater than or equal to 63
+  const numberOptions = ["ones", "twos", "threes", "fours", "fives", "sixes"];
+  let sumOfNumberOptions = 0;
+  if (numberOptions.every((option) => playerAndScore.scores[option] !== null)) {
+    numberOptions.forEach((option) => {
+      sumOfNumberOptions += playerAndScore.scores[option];
+    });
+
+    if (sumOfNumberOptions >= 63) {
+      playerAndScore.bonus = 35;
+      total += 35;
     }
   }
 
