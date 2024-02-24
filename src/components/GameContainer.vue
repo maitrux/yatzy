@@ -147,7 +147,6 @@ const countTotal = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 50px;
 }
 
 .column {
@@ -165,9 +164,5 @@ const countTotal = () => {
 .displayed-score {
   text-align: center;
   height: 36px;
-}
-
-.dice-container {
-  width: 300px;
 }
 </style>

@@ -14,12 +14,14 @@
           <div
             v-for="(score, option) in playerAndScore.scores"
             :key="option"
-            class="d-flex align-center justify-space-between mb-2"
+            class="d-flex align-center justify-space-between score-container"
           >
             <div>{{ option.charAt(0).toUpperCase() + option.slice(1) }}</div>
             <v-btn
               v-if="score === null"
               flat
+              density="compact"
+              icon="mdi-plus"
               color="primary"
               :disabled="
                 playerAndScore.name !== props.currentPlayer.name ||
@@ -27,7 +29,6 @@
               "
               @click="saveScore(option)"
             >
-              ADD
             </v-btn>
             <div
               v-else
@@ -76,26 +77,26 @@ const props = defineProps({
 const emit = defineEmits(["swithPlayer"]);
 
 const playersAndScores = ref([
-  // {
-  //   name: "Player 1",
-  //   scores: {
-  //     ones: null,
-  //     twos: null,
-  //     threes: null,
-  //     fours: null,
-  //     fives: null,
-  //     sixes: null,
-  //     threeOfAKind: null,
-  //     fourOfAKind: null,
-  //     smallStraight: null,
-  //     largeStraight: null,
-  //     fullHouse: null,
-  //     chance: null,
-  //     yatzy: null,
-  //   },
-  //   bonus: 0,
-  //   total: 0,
-  // },
+  {
+    name: "Player 1",
+    scores: {
+      ones: null,
+      twos: null,
+      threes: null,
+      fours: null,
+      fives: null,
+      sixes: null,
+      threeOfAKind: null,
+      fourOfAKind: null,
+      smallStraight: null,
+      largeStraight: null,
+      fullHouse: null,
+      chance: null,
+      yatzy: null,
+    },
+    bonus: 0,
+    total: 0,
+  },
   {
     name: "Player 2",
     scores: {
@@ -116,26 +117,26 @@ const playersAndScores = ref([
     bonus: 0,
     total: 0,
   },
-  {
-    name: "Player 1",
-    scores: {
-      ones: 3,
-      twos: 12,
-      threes: 9,
-      fours: 16,
-      fives: 15,
-      sixes: 18,
-      threeOfAKind: null,
-      fourOfAKind: null,
-      smallStraight: null,
-      largeStraight: null,
-      fullHouse: null,
-      chance: null,
-      yatzy: null,
-    },
-    bonus: 0,
-    total: 0,
-  },
+  // {
+  //   name: "Player 1",
+  //   scores: {
+  //     ones: 3,
+  //     twos: 12,
+  //     threes: 9,
+  //     fours: 16,
+  //     fives: 15,
+  //     sixes: 18,
+  //     threeOfAKind: null,
+  //     fourOfAKind: null,
+  //     smallStraight: null,
+  //     largeStraight: null,
+  //     fullHouse: null,
+  //     chance: null,
+  //     yatzy: null,
+  //   },
+  //   bonus: 0,
+  //   total: 0,
+  // },
 ]);
 
 const mapSelectedOptionToNumber = {
@@ -362,5 +363,9 @@ const countTotal = (playerAndScore) => {
 .displayed-score {
   text-align: center;
   height: 36px;
+}
+
+.score-container {
+  height: 42px;
 }
 </style>
