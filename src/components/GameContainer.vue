@@ -2,7 +2,10 @@
   <div class="app-container">
     <div class="d-flex">
       <v-card class="dice-container mr-8">
-        <v-card-text>
+        <v-card-text
+          class="d-flex flex-column justify-between"
+          style="height: 100%"
+        >
           <div class="d-flex mb-8 justify-center">
             <div
               v-for="player in players"
@@ -56,12 +59,13 @@
           </div>
 
           <v-alert
-            v-if="numberOfRolls >= 1"
             color="primary"
-            class="mt-8"
+            class="mt-8 flex-end"
             variant="tonal"
             max-width="236"
           >
+            <div class="font-weight-bold mb-8">How to play?</div>
+            <div class="mb-8">Roll all dice</div>
             <div>Select the field you want to insert your socre</div>
             <div class="font-weight-bold mt-2 mb-2">OR</div>
             <div>
@@ -69,14 +73,22 @@
               them. You can roll the dice up to 3 times during your turn.
             </div>
           </v-alert>
+          <v-btn
+            class="mt-8"
+            color="primary"
+            flat
+            @click="resetGame"
+          >
+            Play again
+          </v-btn>
         </v-card-text>
       </v-card>
 
       <!-- Score sheets -->
       <ScoreSheetsContainer
         :currentPlayer="currentPlayer"
-        :totalScore="total"
         :dice="dice"
+        :isGameReset="isGameReset"
         @swithPlayer="onSwitchPlayer"
       />
     </div>
@@ -86,6 +98,8 @@
 <script setup>
 import { ref } from "vue";
 import ScoreSheetsContainer from "./ScoreSheetsContainer.vue";
+
+const isGameReset = ref(false);
 
 const players = ref([
   { name: "Player 1", turn: true },
@@ -100,14 +114,11 @@ const dice = [ref(0), ref(0), ref(0), ref(0), ref(0)];
 
 const selectedDice = ref([]);
 
-const total = ref(0);
-
 // when number of rolls is 3, switch to next player
 const onSwitchPlayer = () => {
   // reset dice and number of rolls
   dice.forEach((die) => (die.value = 0));
   numberOfRolls.value = 0;
-  total.value = 0;
   selectedDice.value = [];
 
   const nextPlayer = players.value.find(
@@ -139,12 +150,28 @@ const rollTheDice = () => {
   }
 
   numberOfRolls.value++;
-  countTotal();
   selectedDice.value = [];
 };
 
-const countTotal = () => {
-  total.value = dice.reduce((acc, die) => acc + die.value, 0);
+const resetGame = () => {
+  // reset dice and number of rolls
+  dice.forEach((die) => (die.value = 0));
+  numberOfRolls.value = 0;
+  selectedDice.value = [];
+
+  // reset players
+  players.value.forEach((player) => {
+    player.turn = false;
+  });
+
+  players.value[0].turn = true;
+  currentPlayer.value = players.value[0];
+
+  isGameReset.value = true;
+
+  setTimeout(() => {
+    isGameReset.value = false;
+  }, 50);
 };
 </script>
 

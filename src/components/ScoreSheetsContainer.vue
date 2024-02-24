@@ -23,10 +23,7 @@
               density="compact"
               icon="mdi-plus"
               color="primary"
-              :disabled="
-                playerAndScore.name !== props.currentPlayer.name ||
-                totalScore === 0
-              "
+              :disabled="playerAndScore.name !== props.currentPlayer.name"
               @click="saveScore(option)"
             >
             </v-btn>
@@ -68,12 +65,13 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits } from "vue";
+import { ref, defineProps, defineEmits, watch } from "vue";
 
 const props = defineProps({
   currentPlayer: Object,
   totalScore: Number,
   dice: Array,
+  isGameReset: Boolean,
 });
 
 const emit = defineEmits(["swithPlayer"]);
@@ -149,6 +147,22 @@ const mapSelectedOptionToNumber = {
   fives: 5,
   sixes: 6,
 };
+
+// watch isGameReset to reset the game
+watch(
+  () => props.isGameReset,
+  (newValue) => {
+    if (newValue && props.isGameReset === true) {
+      playersAndScores.value.forEach((playerAndScore) => {
+        for (const score in playerAndScore.scores) {
+          playerAndScore.scores[score] = null;
+        }
+        playerAndScore.bonus = 0;
+        playerAndScore.total = 0;
+      });
+    }
+  }
+);
 
 // return string to camel case but with first letter not capitalized
 const toCamelCase = (string) => {
