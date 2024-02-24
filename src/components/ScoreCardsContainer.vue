@@ -133,6 +133,10 @@ const saveScore = (selectedOption) => {
     score = getThreeOrFourOfAKindScore(4);
   }
 
+  if (optionKey === "fullHouse") {
+    score = getFullHouseScore();
+  }
+
   if (optionKey === "smallStraight") {
     score = getStraightScore(4);
   }
@@ -195,6 +199,27 @@ const getLargestNumberOfSameValues = (arr) => {
   });
 
   return maxCount;
+};
+
+const getFullHouseScore = () => {
+  const diceValues = props.dice.map((die) => die.value);
+  const count = {};
+
+  diceValues.forEach((num) => {
+    count[num] = (count[num] || 0) + 1;
+  });
+
+  const values = Object.values(count);
+
+  console.log(values);
+
+  // if the condition is met, return 25
+  if (values.includes(3) && values.includes(2)) {
+    return 25;
+  }
+
+  // if the condition is not met, return 0
+  return 0;
 };
 
 const getStraightScore = (lengthOfStraight) => {
