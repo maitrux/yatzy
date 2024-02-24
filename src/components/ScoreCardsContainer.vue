@@ -18,7 +18,7 @@
           >
             <div>{{ option.charAt(0).toUpperCase() + option.slice(1) }}</div>
             <v-btn
-              v-if="!score"
+              v-if="score === null"
               flat
               color="primary"
               :disabled="
@@ -63,6 +63,13 @@ const playersAndScores = ref([
       fours: null,
       fives: null,
       sixes: null,
+      threeOfAKind: null,
+      fourOfAKind: null,
+      smallStraight: null,
+      largeStraight: null,
+      fullHouse: null,
+      chance: null,
+      yatzy: null,
     },
   },
   {
@@ -74,6 +81,13 @@ const playersAndScores = ref([
       fours: null,
       fives: null,
       sixes: null,
+      threeOfAKind: null,
+      fourOfAKind: null,
+      smallStraight: null,
+      largeStraight: null,
+      fullHouse: null,
+      chance: null,
+      yatzy: null,
     },
   },
 ]);
@@ -87,29 +101,146 @@ const mapSelectedOptionToNumber = {
   sixes: 6,
 };
 
+// return string to camel case but with first letter not capitalized
+const toCamelCase = (string) => {
+  return string.replace(/\s(\w)/g, (_, char) => char.toUpperCase());
+};
+
 const saveScore = (selectedOption) => {
   // find the player in the playersAndScores array
   const currentPlayerAndScore = playersAndScores.value.find(
     (playerAndScore) => playerAndScore.name === props.currentPlayer.name
   );
 
-  // the score will be the sum of thse dice that match the selected score option
+  let score = 0;
+
+  // key in the score object. e.g., 'ones', 'twos', 'twoPairs, 'threeOfAKind' etc.
+  const optionKey = toCamelCase(selectedOption);
+
+  // for 'ones', 'twos', 'threes', 'fours', 'fives', 'sixes' options,
+  // the score is the sum of the dice that match the selected option
+  const numberOptions = ["ones", "twos", "threes", "fours", "fives", "sixes"];
+
+  if (numberOptions.includes(optionKey)) {
+    score = getNumberOptionScore(optionKey);
+  }
+
+  if (optionKey === "threeOfAKind") {
+    score = getThreeOrFourOfAKindScore(3);
+  }
+
+  if (optionKey === "fourOfAKind") {
+    score = getThreeOrFourOfAKindScore(4);
+  }
+
+  if (optionKey === "smallStraight") {
+    score = getStraightScore(4);
+  }
+
+  if (optionKey === "largeStraight") {
+    score = getStraightScore(5);
+  }
+
+  if (optionKey === "chance") {
+    score = getSumOfAllDice();
+  }
+
+  if (optionKey === "yatzy") {
+    score = getYatzyScore();
+  }
+
+  console.log(score);
+
+  // update the score of the current player. the selected score saving option is the key of the score object
+  currentPlayerAndScore.scores[optionKey] = score;
+
+  emit("swithPlayer");
+};
+
+const getNumberOptionScore = (optionKey) => {
   let multiplier = 0;
 
-  const selectedOptionAsNumber =
-    mapSelectedOptionToNumber[selectedOption.toLowerCase()];
+  const selectedOptionAsNumber = mapSelectedOptionToNumber[optionKey];
 
   props.dice.forEach((die) => {
-    if (die.value === selectedOptionAsNumber) {
+    if (die.value === mapSelectedOptionToNumber[optionKey]) {
       multiplier++;
     }
   });
 
-  // update the score of the current player. the selected score saving option is the key of the score object
-  currentPlayerAndScore.scores[selectedOption.toLowerCase()] =
-    multiplier * selectedOptionAsNumber;
+  return multiplier * selectedOptionAsNumber;
+};
 
-  emit("swithPlayer");
+const getThreeOrFourOfAKindScore = (numberOfDiceThatNeedToMatch) => {
+  const diceValues = props.dice.map((die) => die.value);
+  const largestNumberOfSameValues = getLargestNumberOfSameValues(diceValues);
+
+  // check if the condition of 'three of a kind' or 'four of a kind' is met
+  // if not, return 0
+  if (largestNumberOfSameValues < numberOfDiceThatNeedToMatch) {
+    return 0;
+  }
+
+  // if the condition is met, return the sum of all dice
+  return getSumOfAllDice();
+};
+
+const getLargestNumberOfSameValues = (arr) => {
+  const count = {};
+  let maxCount = 0;
+
+  arr.forEach((num) => {
+    count[num] = (count[num] || 0) + 1;
+    maxCount = Math.max(maxCount, count[num]);
+  });
+
+  return maxCount;
+};
+
+const getStraightScore = (lengthOfStraight) => {
+  const diceValues = props.dice.map((die) => die.value);
+  const sortedDice = diceValues.sort((a, b) => a - b);
+
+  // small straight: [1, 2, 3, 4] or [2, 3, 4, 5] or [3, 4, 5, 6]
+  // large straight: [1, 2, 3, 4, 5] or [2, 3, 4, 5, 6]
+
+  let numberOfConsecutiveNumbers = 1;
+
+  sortedDice.forEach((die, i) => {
+    if (die === sortedDice[i + 1] - 1) {
+      numberOfConsecutiveNumbers++;
+    }
+  });
+
+  // Return the corresponding score
+  if (numberOfConsecutiveNumbers >= lengthOfStraight) {
+    return lengthOfStraight === 4 ? 30 : 40; // Large or small straight score
+  } else {
+    return 0; // Not a valid straight
+  }
+};
+
+const getYatzyScore = () => {
+  const diceValues = props.dice.map((die) => die.value);
+  const largestNumberOfSameValues = getLargestNumberOfSameValues(diceValues);
+
+  // if the condition is met, return 50
+  if (largestNumberOfSameValues === 5) {
+    return 50;
+  }
+
+  // if the condition is not met, return 0
+  return 0;
+};
+
+const getSumOfAllDice = () => {
+  let sum = 0;
+
+  props.dice.forEach((die) => {
+    sum += die.value;
+  });
+
+  return sum;
 };
 </script>
 
