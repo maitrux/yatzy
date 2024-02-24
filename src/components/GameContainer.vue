@@ -17,7 +17,7 @@
                 label
                 :color="player.turn ? 'primary' : 'grey'"
               >
-                {{ player.name }}
+                <div class="font-weight-bold">{{ player.name }}</div>
               </v-chip>
             </div>
           </div>
@@ -139,7 +139,7 @@ const onSwitchPlayer = () => {
 
 const rollTheDice = () => {
   // if first roll, roll all dice
-  if (numberOfRolls.value === 0) {
+  if (numberOfRolls.value === 0 || selectedDice.value.length === 0) {
     dice.forEach((die) => {
       die.value = Math.floor(Math.random() * 6) + 1;
     });

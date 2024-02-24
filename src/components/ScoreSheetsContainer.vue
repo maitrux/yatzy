@@ -5,7 +5,6 @@
       v-for="playerAndScore in playersAndScores"
       :key="playerAndScore.name"
       class="mr-8"
-      width="200"
     >
       <v-card-text>
         <div>
@@ -16,7 +15,7 @@
             :key="option"
             class="d-flex align-center justify-space-between score-container"
           >
-            <div>{{ option.charAt(0).toUpperCase() + option.slice(1) }}</div>
+            <div class="option-title">{{ mapOptionToTitle(option) }}</div>
             <v-btn
               v-if="score === null"
               flat
@@ -88,9 +87,9 @@ const playersAndScores = ref([
       sixes: null,
       threeOfAKind: null,
       fourOfAKind: null,
+      fullHouse: null,
       smallStraight: null,
       largeStraight: null,
-      fullHouse: null,
       chance: null,
       yatzy: null,
     },
@@ -108,9 +107,9 @@ const playersAndScores = ref([
       sixes: null,
       threeOfAKind: null,
       fourOfAKind: null,
+      fullHouse: null,
       smallStraight: null,
       largeStraight: null,
-      fullHouse: null,
       chance: null,
       yatzy: null,
     },
@@ -148,6 +147,22 @@ const mapSelectedOptionToNumber = {
   sixes: 6,
 };
 
+const mapOptionsToTitles = {
+  ones: "Ones (1 for each)",
+  twos: "Twos (2 for each)",
+  threes: "Threes (3 for each)",
+  fours: "Fours (4 for each)",
+  fives: "Fives (5 for each)",
+  sixes: "Sixes (6 for each)",
+  threeOfAKind: "Three of a kind (sum of all dice)",
+  fourOfAKind: "Four of a kind (sum of all dice)",
+  fullHouse: "Full house (25 points)",
+  smallStraight: "Small straight (30 points)",
+  largeStraight: "Large straight (40 points)",
+  chance: "Chance (sum of all dice)",
+  yatzy: "Yatzy (50 points)",
+};
+
 // watch isGameReset to reset the game
 watch(
   () => props.isGameReset,
@@ -163,6 +178,10 @@ watch(
     }
   }
 );
+
+const mapOptionToTitle = (option) => {
+  return mapOptionsToTitles[option];
+};
 
 // return string to camel case but with first letter not capitalized
 const toCamelCase = (string) => {
@@ -374,18 +393,6 @@ const allFieldsFilled = (playerAndScore) => {
   margin-top: 50px;
 }
 
-.column {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  width: 50%; /* Set both columns to occupy equal width */
-}
-
-.column div {
-  margin-bottom: 8px;
-}
-
 .displayed-score {
   text-align: center;
   height: 36px;
@@ -393,5 +400,10 @@ const allFieldsFilled = (playerAndScore) => {
 
 .score-container {
   height: 42px;
+}
+
+.option-title {
+  width: 250px;
+  text-align: left;
 }
 </style>
