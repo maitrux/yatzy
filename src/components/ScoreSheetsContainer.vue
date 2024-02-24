@@ -9,7 +9,7 @@
     >
       <v-card-text>
         <div>
-          <div class="mb-8">{{ playerAndScore.name }}</div>
+          <div class="mb-8 font-weight-bold">{{ playerAndScore.name }}</div>
           <!-- Loop through each score option -->
           <div
             v-for="(score, option) in playerAndScore.scores"
@@ -39,24 +39,26 @@
           </div>
         </div>
 
-        <v-btn
-          class="mt-4"
-          color="primary"
-          @click="countTotal(playerAndScore)"
-        >
-          Count total
-        </v-btn>
-        <div class="mt-4">
-          <div class="d-flex align-center justify-space-between">
-            <div>Bonus</div>
-            <div class="displayed-score d-flex align-center justify-center">
-              {{ playerAndScore.bonus }}
+        <div v-if="allFieldsFilled(playerAndScore)">
+          <v-btn
+            class="mt-4"
+            color="primary"
+            @click="countTotal(playerAndScore)"
+          >
+            Count total
+          </v-btn>
+          <div class="mt-4">
+            <div class="d-flex align-center justify-space-between">
+              <div>Bonus</div>
+              <div class="displayed-score d-flex align-center justify-center">
+                {{ playerAndScore.bonus }}
+              </div>
             </div>
-          </div>
-          <div class="d-flex align-center justify-space-between">
-            <div>Total</div>
-            <div class="displayed-score d-flex align-center justify-center">
-              {{ playerAndScore.total }}
+            <div class="d-flex align-center justify-space-between">
+              <div>Total</div>
+              <div class="displayed-score d-flex align-center justify-center">
+                {{ playerAndScore.total }}
+              </div>
             </div>
           </div>
         </div>
@@ -337,6 +339,16 @@ const countTotal = (playerAndScore) => {
   playerAndScore.total = total;
 
   console.log(total);
+};
+
+const allFieldsFilled = (playerAndScore) => {
+  for (const score in playerAndScore.scores) {
+    if (playerAndScore.scores[score] === null) {
+      return false;
+    }
+  }
+
+  return true;
 };
 </script>
 

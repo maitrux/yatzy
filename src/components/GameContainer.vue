@@ -30,7 +30,7 @@
             >
               Roll the dice
             </v-btn>
-            <v-chip>{{ numberOfRolls }}</v-chip>
+            <v-chip color="primary">{{ numberOfRolls }}</v-chip>
           </div>
 
           <!-- Dice -->
@@ -40,6 +40,8 @@
             <v-chip-group
               v-model="selectedDice"
               multiple
+              variant="outlined"
+              :disabled="numberOfRolls === 0 || numberOfRolls === 3"
             >
               <v-chip
                 v-for="(die, i) in dice"
@@ -47,7 +49,6 @@
                 :class="i < dice.length - 1 ? 'mr-4' : ''"
                 color="primary"
                 label
-                :disabled="numberOfRolls === 3"
               >
                 {{ die }}
               </v-chip>
@@ -59,9 +60,14 @@
             color="primary"
             class="mt-8"
             variant="tonal"
+            max-width="236"
           >
-            Select the dice you want to roll again by clicking them. You can
-            roll dice up to 3 times.
+            <div>Select the field you want to insert your socre</div>
+            <div class="font-weight-bold mt-2 mb-2">OR</div>
+            <div>
+              Roll again. You can select the dice you want to roll by clicking
+              them. You can roll the dice up to 3 times during your turn.
+            </div>
           </v-alert>
         </v-card-text>
       </v-card>
@@ -164,5 +170,9 @@ const countTotal = () => {
 .displayed-score {
   text-align: center;
   height: 36px;
+}
+
+::v-deep(.v-chip--disabled) {
+  opacity: 1;
 }
 </style>
