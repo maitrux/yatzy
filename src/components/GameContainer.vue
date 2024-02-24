@@ -53,6 +53,16 @@
               </v-chip>
             </v-chip-group>
           </div>
+
+          <v-alert
+            v-if="numberOfRolls >= 1"
+            color="primary"
+            class="mt-8"
+            variant="tonal"
+          >
+            Select the dice you want to roll again by clicking them. You can
+            roll dice up to 3 times.
+          </v-alert>
         </v-card-text>
       </v-card>
 
@@ -157,10 +167,7 @@ const countTotal = () => {
   height: 36px;
 }
 
-/* .dice-container {
-  border: 1px solid #ccc;
-  height: 224px;
-  padding: 16px;
-  border-radius: 8px;
-} */
+.dice-container {
+  width: 300px;
+}
 </style>
