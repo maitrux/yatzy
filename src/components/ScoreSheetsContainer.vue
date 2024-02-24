@@ -1,10 +1,10 @@
 <template>
   <!-- Score sheets -->
-  <div class="d-flex mt-8">
+  <div class="d-flex">
     <v-card
       v-for="playerAndScore in playersAndScores"
       :key="playerAndScore.name"
-      class="mr-4"
+      class="mr-8"
       width="200"
     >
       <v-card-text>
@@ -37,6 +37,15 @@
             </div>
           </div>
         </div>
+
+        <v-btn
+          class="mt-8"
+          color="primary"
+          @click="countTotal(playerAndScore)"
+        >
+          Count total
+        </v-btn>
+        <div>Total: {{ playerAndScore.total }}</div>
       </v-card-text>
     </v-card>
   </div>
@@ -71,6 +80,7 @@ const playersAndScores = ref([
       chance: null,
       yatzy: null,
     },
+    total: 0,
   },
   {
     name: "Player 2",
@@ -89,6 +99,7 @@ const playersAndScores = ref([
       chance: null,
       yatzy: null,
     },
+    total: 0,
   },
 ]);
 
@@ -153,8 +164,6 @@ const saveScore = (selectedOption) => {
     score = getYatzyScore();
   }
 
-  console.log(score);
-
   // update the score of the current player. the selected score saving option is the key of the score object
   currentPlayerAndScore.scores[optionKey] = score;
 
@@ -211,8 +220,6 @@ const getFullHouseScore = () => {
 
   const values = Object.values(count);
 
-  console.log(values);
-
   // if the condition is met, return 25
   if (values.includes(3) && values.includes(2)) {
     return 25;
@@ -266,6 +273,20 @@ const getSumOfAllDice = () => {
   });
 
   return sum;
+};
+
+const countTotal = (playerAndScore) => {
+  let total = 0;
+
+  for (const score in playerAndScore.scores) {
+    if (playerAndScore.scores[score] !== null) {
+      total += playerAndScore.scores[score];
+    }
+  }
+
+  playerAndScore.total = total;
+
+  console.log(total);
 };
 </script>
 

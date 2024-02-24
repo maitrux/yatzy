@@ -1,69 +1,75 @@
 <template>
-  <div class="game-container">
-    <div class="d-flex mb-8">
-      <div
-        v-for="player in players"
-        :key="player.name"
-      >
-        <v-chip
-          :key="player.name"
-          class="mr-4"
-          label
-          :color="player.turn ? 'primary' : 'grey'"
-        >
-          {{ player.name }}
-        </v-chip>
-      </div>
+  <div class="app-container">
+    <div class="d-flex">
+      <v-card class="dice-container mr-8">
+        <v-card-text>
+          <div class="d-flex mb-8 justify-center">
+            <div
+              v-for="player in players"
+              :key="player.name"
+            >
+              <v-chip
+                :key="player.name"
+                class="mr-4"
+                label
+                :color="player.turn ? 'primary' : 'grey'"
+              >
+                {{ player.name }}
+              </v-chip>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="d-flex mb-8 justify-center align-center">
+            <v-btn
+              class="mr-4"
+              @click="rollTheDice"
+              flat
+              color="primary"
+              :disabled="numberOfRolls === 3"
+            >
+              Roll the dice
+            </v-btn>
+            <v-chip>{{ numberOfRolls }}</v-chip>
+          </div>
+
+          <!-- Dice -->
+          <div class="d-flex justify-center">
+            <!-- @click="rollTheDice(i)" -->
+
+            <v-chip-group
+              v-model="selectedDice"
+              multiple
+            >
+              <v-chip
+                v-for="(die, i) in dice"
+                :key="i"
+                :class="i < dice.length - 1 ? 'mr-4' : ''"
+                color="primary"
+                label
+                :disabled="numberOfRolls === 3"
+              >
+                {{ die }}
+              </v-chip>
+            </v-chip-group>
+          </div>
+        </v-card-text>
+      </v-card>
+
+      <!-- Score sheets -->
+      <ScoreSheetsContainer
+        :currentPlayer="currentPlayer"
+        :totalScore="total"
+        :dice="dice"
+        @swithPlayer="onSwitchPlayer"
+      />
     </div>
-
-    <!-- Actions -->
-    <div class="d-flex mb-8 align-center">
-      <v-btn
-        class="mr-4"
-        @click="rollTheDice"
-        flat
-        color="primary"
-        :disabled="numberOfRolls === 3"
-      >
-        Roll the dice
-      </v-btn>
-      <v-chip>{{ numberOfRolls }}</v-chip>
-    </div>
-
-    <!-- Dice -->
-    <div class="d-flex justify-center">
-      <!-- @click="rollTheDice(i)" -->
-
-      <v-chip-group
-        v-model="selectedDice"
-        multiple
-      >
-        <v-chip
-          v-for="(die, i) in dice"
-          :key="i"
-          class="mr-4"
-          color="primary"
-          label
-          :disabled="numberOfRolls === 3"
-        >
-          {{ die }}
-        </v-chip>
-      </v-chip-group>
-    </div>
-
-    <!-- Score sheets -->
-    <ScoreCardsContainer
-      :currentPlayer="currentPlayer"
-      :totalScore="total"
-      :dice="dice"
-      @swithPlayer="onSwitchPlayer"
-    />
   </div>
 </template>
 
 <script setup>
 import { ref } from "vue";
-import ScoreCardsContainer from "./ScoreCardsContainer.vue";
+import ScoreSheetsContainer from "./ScoreSheetsContainer.vue";
 
 const players = ref([
   { name: "Player 1", turn: true },
@@ -127,7 +133,7 @@ const countTotal = () => {
 </script>
 
 <style scoped>
-.game-container {
+.app-container {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -150,4 +156,11 @@ const countTotal = () => {
   text-align: center;
   height: 36px;
 }
+
+/* .dice-container {
+  border: 1px solid #ccc;
+  height: 224px;
+  padding: 16px;
+  border-radius: 8px;
+} */
 </style>
