@@ -7,75 +7,86 @@
       >
         <v-card class="dice-container">
           <v-card-text
-            class="d-flex flex-column justify-between"
+            class="d-flex flex-column justify-space-between"
             style="height: 100%"
           >
-            <div class="d-flex mb-8 justify-center">
-              <div
-                v-for="player in players"
-                :key="player.name"
-              >
-                <v-chip
+            <div>
+              <div class="d-flex mb-8 justify-center">
+                <div
+                  v-for="player in players"
                   :key="player.name"
+                >
+                  <v-chip
+                    :key="player.name"
+                    class="mr-4"
+                    label
+                    :color="player.turn ? 'primary' : 'grey'"
+                  >
+                    <div class="font-weight-bold">{{ player.name }}</div>
+                  </v-chip>
+                </div>
+              </div>
+
+              <!-- Actions -->
+              <div class="d-flex mb-8 justify-center align-center">
+                <v-btn
                   class="mr-4"
-                  label
-                  :color="player.turn ? 'primary' : 'grey'"
-                >
-                  <div class="font-weight-bold">{{ player.name }}</div>
-                </v-chip>
-              </div>
-            </div>
-
-            <!-- Actions -->
-            <div class="d-flex mb-8 justify-center align-center">
-              <v-btn
-                class="mr-4"
-                @click="rollTheDice"
-                flat
-                color="primary"
-                :disabled="numberOfRolls === 3"
-              >
-                Roll the dice
-              </v-btn>
-              <v-chip color="primary">{{ numberOfRolls }}</v-chip>
-            </div>
-
-            <!-- Dice -->
-            <div class="d-flex justify-center">
-              <!-- @click="rollTheDice(i)" -->
-
-              <v-chip-group
-                v-model="selectedDice"
-                multiple
-                variant="outlined"
-                :disabled="numberOfRolls === 0 || numberOfRolls === 3"
-              >
-                <v-chip
-                  v-for="(die, i) in dice"
-                  :key="i"
-                  :class="i < dice.length - 1 ? 'mr-4' : ''"
+                  @click="rollTheDice"
+                  flat
                   color="primary"
-                  label
+                  :disabled="numberOfRolls === 3"
                 >
-                  {{ die }}
-                </v-chip>
-              </v-chip-group>
-            </div>
-
-            <v-alert
-              color="primary"
-              class="mt-8 flex-end"
-              variant="tonal"
-            >
-              <div class="font-weight-bold mb-8">How to play?</div>
-              <div class="mb-8">Roll all dice</div>
-              <div>Select the field you want to insert your socre</div>
-              <div class="font-weight-bold mt-2 mb-2">OR</div>
-              <div>
-                Roll again. You can select the dice you want to roll by clicking
-                them. You can roll the dice up to 3 times during your turn.
+                  Roll the dice
+                </v-btn>
+                <v-chip color="primary">{{ numberOfRolls }}</v-chip>
               </div>
-            </v-alert>
+
+              <!-- Dice -->
+              <div class="d-flex justify-center">
+                <!-- @click="rollTheDice(i)" -->
+
+                <v-chip-group
+                  v-model="selectedDice"
+                  multiple
+                  variant="outlined"
+                  :disabled="numberOfRolls === 0 || numberOfRolls === 3"
+                >
+                  <v-chip
+                    v-for="(die, i) in dice"
+                    :key="i"
+                    :class="i < dice.length - 1 ? 'mr-4' : ''"
+                    color="primary"
+                    label
+                  >
+                    {{ die }}
+                  </v-chip>
+                </v-chip-group>
+              </div>
+
+              <div class="game-rules-container mt-8">
+                <div
+                  class="font-weight-bold expand-rules-btn"
+                  @click="expand = !expand"
+                >
+                  How to play?
+                </div>
+                <v-expand-transition>
+                  <div
+                    v-show="expand"
+                    class="mx-auto rules-expanded"
+                  >
+                    <div class="mb-8 mt-8">Roll all dice</div>
+                    <div>Select the field you want to insert your socre</div>
+                    <div class="font-weight-bold mt-2 mb-2">OR</div>
+                    <div>
+                      Roll again. You can select the dice you want to roll by
+                      clicking them. You can roll the dice up to 3 times during
+                      your turn.
+                    </div>
+                  </div>
+                </v-expand-transition>
+              </div>
+            </div>
             <v-btn
               class="mt-8"
               color="primary"
@@ -117,6 +128,8 @@ const numberOfRolls = ref(0);
 const dice = [ref(0), ref(0), ref(0), ref(0), ref(0)];
 
 const selectedDice = ref([]);
+
+const expand = ref(false);
 
 // when number of rolls is 3, switch to next player
 const onSwitchPlayer = () => {
@@ -206,5 +219,39 @@ const resetGame = () => {
 
 ::v-deep(.v-chip--disabled) {
   opacity: 1;
+}
+
+.expand-rules-btn {
+  cursor: pointer;
+
+  @media screen and (min-width: 401px) {
+    cursor: default;
+    pointer-events: none;
+  }
+}
+
+.rules-expanded {
+  max-width: 200px;
+
+  @media screen and (max-width: 400px) {
+    max-width: 250px;
+  }
+
+  @media screen and (min-width: 401px) {
+    display: block !important;
+  }
+}
+
+.dice-container {
+  @media screen and (min-width: 401px) {
+    height: 630px;
+  }
+}
+
+.game-rules-container {
+  background-color: #e4ecf7;
+  color: #1867c0;
+  padding: 12px;
+  border-radius: 4px;
 }
 </style>
