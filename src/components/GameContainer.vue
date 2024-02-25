@@ -43,8 +43,6 @@
 
               <!-- Dice -->
               <div class="d-flex justify-center">
-                <!-- @click="rollTheDice(i)" -->
-
                 <v-chip-group
                   v-model="selectedDice"
                   multiple
@@ -111,7 +109,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import ScoreSheetsContainer from "./ScoreSheetsContainer.vue";
 
 const isGameReset = ref(false);
@@ -153,6 +151,14 @@ const onSwitchPlayer = () => {
     }
   });
 };
+
+onMounted(() => {
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      rollTheDice();
+    }
+  });
+});
 
 const rollTheDice = () => {
   // if first roll, roll all dice
