@@ -224,7 +224,7 @@ const resetGame = () => {
 .expand-rules-btn {
   cursor: pointer;
 
-  @media screen and (min-width: 401px) {
+  @media screen and (min-width: 601px) {
     cursor: default;
     pointer-events: none;
   }
@@ -233,17 +233,17 @@ const resetGame = () => {
 .rules-expanded {
   max-width: 200px;
 
-  @media screen and (max-width: 400px) {
+  @media screen and (max-width: 600px) {
     max-width: 250px;
   }
 
-  @media screen and (min-width: 401px) {
+  @media screen and (min-width: 601px) {
     display: block !important;
   }
 }
 
 .dice-container {
-  @media screen and (min-width: 401px) {
+  @media screen and (min-width: 601px) {
     height: 630px;
   }
 }
