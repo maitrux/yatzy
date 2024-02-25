@@ -11,13 +11,13 @@
       <v-card-text>
         <div>
           <div class="mb-8 font-weight-bold">{{ playerAndScore.name }}</div>
-          <!-- Loop through each score option -->
+          <!-- Loop through each score field -->
           <div
-            v-for="(score, option) in playerAndScore.scores"
-            :key="option"
+            v-for="(score, field) in playerAndScore.scores"
+            :key="field"
             class="d-flex align-center justify-space-between score-container"
           >
-            <div class="option-title">{{ mapOptionToTitle(option) }}</div>
+            <div class="field-title">{{ mapFieldToTitle(field) }}</div>
             <v-btn
               v-if="score === null"
               flat
@@ -25,7 +25,7 @@
               icon="mdi-plus"
               color="primary"
               :disabled="playerAndScore.name !== props.currentPlayer.name"
-              @click="saveScore(option)"
+              @click="saveScore(field)"
             >
             </v-btn>
             <div
@@ -95,6 +95,7 @@ const playersAndScores = ref([
       chance: null,
       yatzy: null,
     },
+    secondYatzy: null,
     bonus: 0,
     total: 0,
   },
@@ -115,6 +116,7 @@ const playersAndScores = ref([
       chance: null,
       yatzy: null,
     },
+    secondYatzy: null,
     bonus: 0,
     total: 0,
   },
@@ -140,7 +142,7 @@ const playersAndScores = ref([
   // },
 ]);
 
-const mapSelectedOptionToNumber = {
+const mapSelectedFieldToNumber = {
   ones: 1,
   twos: 2,
   threes: 3,
@@ -149,7 +151,7 @@ const mapSelectedOptionToNumber = {
   sixes: 6,
 };
 
-const mapOptionsToTitles = {
+const fieldsAsTitles = {
   ones: "Ones (1 for each)",
   twos: "Twos (2 for each)",
   threes: "Threes (3 for each)",
@@ -181,8 +183,8 @@ watch(
   }
 );
 
-const mapOptionToTitle = (option) => {
-  return mapOptionsToTitles[option];
+const mapFieldToTitle = (field) => {
+  return fieldsAsTitles[field];
 };
 
 // return string to camel case but with first letter not capitalized
@@ -190,7 +192,7 @@ const toCamelCase = (string) => {
   return string.replace(/\s(\w)/g, (_, char) => char.toUpperCase());
 };
 
-const saveScore = (selectedOption) => {
+const saveScore = (selectedField) => {
   // find the player in the playersAndScores array
   const currentPlayerAndScore = playersAndScores.value.find(
     (playerAndScore) => playerAndScore.name === props.currentPlayer.name
@@ -199,62 +201,62 @@ const saveScore = (selectedOption) => {
   let score = 0;
 
   // key in the score object. e.g., 'ones', 'twos', 'twoPairs, 'threeOfAKind' etc.
-  const optionKey = toCamelCase(selectedOption);
+  const fieldKey = toCamelCase(selectedField);
 
-  // for 'ones', 'twos', 'threes', 'fours', 'fives', 'sixes' options,
-  // the score is the sum of the dice that match the selected option
-  const numberOptions = ["ones", "twos", "threes", "fours", "fives", "sixes"];
+  // for fields 'ones', 'twos', 'threes', 'fours', 'fives', 'sixes',
+  // the score is the sum of the dice that match the selected field
+  const numberFields = ["ones", "twos", "threes", "fours", "fives", "sixes"];
 
-  if (numberOptions.includes(optionKey)) {
-    score = getNumberOptionScore(optionKey);
+  if (numberFields.includes(fieldKey)) {
+    score = getNumberFieldScore(fieldKey);
   }
 
-  if (optionKey === "threeOfAKind") {
+  if (fieldKey === "threeOfAKind") {
     score = getThreeOrFourOfAKindScore(3);
   }
 
-  if (optionKey === "fourOfAKind") {
+  if (fieldKey === "fourOfAKind") {
     score = getThreeOrFourOfAKindScore(4);
   }
 
-  if (optionKey === "fullHouse") {
+  if (fieldKey === "fullHouse") {
     score = getFullHouseScore();
   }
 
-  if (optionKey === "smallStraight") {
+  if (fieldKey === "smallStraight") {
     score = getStraightScore(4);
   }
 
-  if (optionKey === "largeStraight") {
+  if (fieldKey === "largeStraight") {
     score = getStraightScore(5);
   }
 
-  if (optionKey === "chance") {
+  if (fieldKey === "chance") {
     score = getSumOfAllDice();
   }
 
-  if (optionKey === "yatzy") {
+  if (fieldKey === "yatzy") {
     score = getYatzyScore();
   }
 
-  // update the score of the current player. the selected score saving option is the key of the score object
-  currentPlayerAndScore.scores[optionKey] = score;
+  // update the score of the current player. the selected score saving field is the key of the score object
+  currentPlayerAndScore.scores[fieldKey] = score;
 
   emit("swithPlayer");
 };
 
-const getNumberOptionScore = (optionKey) => {
+const getNumberFieldScore = (fieldKey) => {
   let multiplier = 0;
 
-  const selectedOptionAsNumber = mapSelectedOptionToNumber[optionKey];
+  const selectedFieldAsNumber = mapSelectedFieldToNumber[fieldKey];
 
   props.dice.forEach((die) => {
-    if (die.value === mapSelectedOptionToNumber[optionKey]) {
+    if (die.value === mapSelectedFieldToNumber[fieldKey]) {
       multiplier++;
     }
   });
 
-  return multiplier * selectedOptionAsNumber;
+  return multiplier * selectedFieldAsNumber;
 };
 
 const getThreeOrFourOfAKindScore = (numberOfDiceThatNeedToMatch) => {
@@ -357,15 +359,15 @@ const countTotal = (playerAndScore) => {
     }
   }
 
-  // check if the total of const numberOptions = ["ones", "twos", "threes", "fours", "fives", "sixes"] is greater than or equal to 63
-  const numberOptions = ["ones", "twos", "threes", "fours", "fives", "sixes"];
-  let sumOfNumberOptions = 0;
-  if (numberOptions.every((option) => playerAndScore.scores[option] !== null)) {
-    numberOptions.forEach((option) => {
-      sumOfNumberOptions += playerAndScore.scores[option];
+  // check if the total of const numberFields = ["ones", "twos", "threes", "fours", "fives", "sixes"] is greater than or equal to 63
+  const numberFields = ["ones", "twos", "threes", "fours", "fives", "sixes"];
+  let sumOfNumberFields = 0;
+  if (numberFields.every((field) => playerAndScore.scores[field] !== null)) {
+    numberFields.forEach((field) => {
+      sumOfNumberFields += playerAndScore.scores[field];
     });
 
-    if (sumOfNumberOptions >= 63) {
+    if (sumOfNumberFields >= 63) {
       playerAndScore.bonus = 35;
       total += 35;
     }
@@ -404,7 +406,7 @@ const allFieldsFilled = (playerAndScore) => {
   height: 42px;
 }
 
-.option-title {
+.field-title {
   width: 250px;
   text-align: left;
 }
