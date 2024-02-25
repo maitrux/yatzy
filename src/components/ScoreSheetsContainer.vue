@@ -1,11 +1,13 @@
 <template>
   <!-- Score sheets -->
-  <div class="d-flex">
-    <v-card
-      v-for="playerAndScore in playersAndScores"
-      :key="playerAndScore.name"
-      class="mr-8"
-    >
+
+  <v-col
+    xs="12"
+    sm="4"
+    v-for="playerAndScore in playersAndScores"
+    :key="playerAndScore.name"
+  >
+    <v-card>
       <v-card-text>
         <div>
           <div class="mb-8 font-weight-bold">{{ playerAndScore.name }}</div>
@@ -60,7 +62,7 @@
         </div>
       </v-card-text>
     </v-card>
-  </div>
+  </v-col>
 </template>
 
 <script setup>

@@ -1,88 +1,92 @@
 <template>
   <div class="app-container">
-    <div class="d-flex">
-      <v-card class="dice-container mr-8">
-        <v-card-text
-          class="d-flex flex-column justify-between"
-          style="height: 100%"
-        >
-          <div class="d-flex mb-8 justify-center">
-            <div
-              v-for="player in players"
-              :key="player.name"
-            >
-              <v-chip
+    <v-row>
+      <v-col
+        xs="12"
+        sm="4"
+      >
+        <v-card class="dice-container">
+          <v-card-text
+            class="d-flex flex-column justify-between"
+            style="height: 100%"
+          >
+            <div class="d-flex mb-8 justify-center">
+              <div
+                v-for="player in players"
                 :key="player.name"
+              >
+                <v-chip
+                  :key="player.name"
+                  class="mr-4"
+                  label
+                  :color="player.turn ? 'primary' : 'grey'"
+                >
+                  <div class="font-weight-bold">{{ player.name }}</div>
+                </v-chip>
+              </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="d-flex mb-8 justify-center align-center">
+              <v-btn
                 class="mr-4"
-                label
-                :color="player.turn ? 'primary' : 'grey'"
-              >
-                <div class="font-weight-bold">{{ player.name }}</div>
-              </v-chip>
-            </div>
-          </div>
-
-          <!-- Actions -->
-          <div class="d-flex mb-8 justify-center align-center">
-            <v-btn
-              class="mr-4"
-              @click="rollTheDice"
-              flat
-              color="primary"
-              :disabled="numberOfRolls === 3"
-            >
-              Roll the dice
-            </v-btn>
-            <v-chip color="primary">{{ numberOfRolls }}</v-chip>
-          </div>
-
-          <!-- Dice -->
-          <div class="d-flex justify-center">
-            <!-- @click="rollTheDice(i)" -->
-
-            <v-chip-group
-              v-model="selectedDice"
-              multiple
-              variant="outlined"
-              :disabled="numberOfRolls === 0 || numberOfRolls === 3"
-            >
-              <v-chip
-                v-for="(die, i) in dice"
-                :key="i"
-                :class="i < dice.length - 1 ? 'mr-4' : ''"
+                @click="rollTheDice"
+                flat
                 color="primary"
-                label
+                :disabled="numberOfRolls === 3"
               >
-                {{ die }}
-              </v-chip>
-            </v-chip-group>
-          </div>
-
-          <v-alert
-            color="primary"
-            class="mt-8 flex-end"
-            variant="tonal"
-            max-width="236"
-          >
-            <div class="font-weight-bold mb-8">How to play?</div>
-            <div class="mb-8">Roll all dice</div>
-            <div>Select the field you want to insert your socre</div>
-            <div class="font-weight-bold mt-2 mb-2">OR</div>
-            <div>
-              Roll again. You can select the dice you want to roll by clicking
-              them. You can roll the dice up to 3 times during your turn.
+                Roll the dice
+              </v-btn>
+              <v-chip color="primary">{{ numberOfRolls }}</v-chip>
             </div>
-          </v-alert>
-          <v-btn
-            class="mt-8"
-            color="primary"
-            flat
-            @click="resetGame"
-          >
-            Play again
-          </v-btn>
-        </v-card-text>
-      </v-card>
+
+            <!-- Dice -->
+            <div class="d-flex justify-center">
+              <!-- @click="rollTheDice(i)" -->
+
+              <v-chip-group
+                v-model="selectedDice"
+                multiple
+                variant="outlined"
+                :disabled="numberOfRolls === 0 || numberOfRolls === 3"
+              >
+                <v-chip
+                  v-for="(die, i) in dice"
+                  :key="i"
+                  :class="i < dice.length - 1 ? 'mr-4' : ''"
+                  color="primary"
+                  label
+                >
+                  {{ die }}
+                </v-chip>
+              </v-chip-group>
+            </div>
+
+            <v-alert
+              color="primary"
+              class="mt-8 flex-end"
+              variant="tonal"
+            >
+              <div class="font-weight-bold mb-8">How to play?</div>
+              <div class="mb-8">Roll all dice</div>
+              <div>Select the field you want to insert your socre</div>
+              <div class="font-weight-bold mt-2 mb-2">OR</div>
+              <div>
+                Roll again. You can select the dice you want to roll by clicking
+                them. You can roll the dice up to 3 times during your turn.
+              </div>
+            </v-alert>
+            <v-btn
+              class="mt-8"
+              color="primary"
+              flat
+              @click="resetGame"
+            >
+              Play again
+            </v-btn>
+          </v-card-text>
+        </v-card>
+      </v-col>
 
       <!-- Score sheets -->
       <ScoreSheetsContainer
@@ -91,7 +95,7 @@
         :isGameReset="isGameReset"
         @swithPlayer="onSwitchPlayer"
       />
-    </div>
+    </v-row>
   </div>
 </template>
 
@@ -180,6 +184,7 @@ const resetGame = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 0 5vw;
 }
 
 .column {
