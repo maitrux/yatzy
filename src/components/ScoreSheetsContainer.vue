@@ -1,6 +1,5 @@
 <template>
   <!-- Score sheets -->
-
   <v-col
     xs="12"
     sm="4"
@@ -63,6 +62,26 @@
       </v-card-text>
     </v-card>
   </v-col>
+
+  <v-dialog
+    v-model="isSecondYatzyDialogOpen"
+    max-width="300px"
+  >
+    <v-card>
+      <v-card-text
+        class="pa-4"
+        style="text-align: center"
+      >
+        <v-icon
+          class="mb-2"
+          color="primary"
+          >mdi-party-popper</v-icon
+        >
+        <div class="mb-2 font-weight-bold">Woop! Yatzy again!</div>
+        <div>Select any field and get the maximum score of that field.</div>
+      </v-card-text>
+    </v-card>
+  </v-dialog>
 </template>
 
 <script setup>
@@ -72,6 +91,7 @@ const props = defineProps({
   currentPlayer: Object,
   totalScore: Number,
   dice: Array,
+  numberOfRolls: Number,
   isGameReset: Boolean,
 });
 
@@ -95,7 +115,6 @@ const playersAndScores = ref([
       chance: null,
       yatzy: null,
     },
-    secondYatzy: null,
     bonus: 0,
     total: 0,
   },
@@ -116,7 +135,6 @@ const playersAndScores = ref([
       chance: null,
       yatzy: null,
     },
-    secondYatzy: null,
     bonus: 0,
     total: 0,
   },
@@ -131,9 +149,9 @@ const playersAndScores = ref([
   //     sixes: 18,
   //     threeOfAKind: null,
   //     fourOfAKind: null,
+  //     fullHouse: null,
   //     smallStraight: null,
   //     largeStraight: null,
-  //     fullHouse: null,
   //     chance: null,
   //     yatzy: null,
   //   },
@@ -167,6 +185,8 @@ const fieldsAsTitles = {
   yatzy: "Yatzy (50 points)",
 };
 
+const isSecondYatzyDialogOpen = ref(false);
+
 // watch isGameReset to reset the game
 watch(
   () => props.isGameReset,
@@ -179,6 +199,23 @@ watch(
         playerAndScore.bonus = 0;
         playerAndScore.total = 0;
       });
+    }
+  }
+);
+
+// watch number of rolls to detect if the dice were thrown again
+watch(
+  () => props.numberOfRolls,
+  (newValue) => {
+    if (newValue) {
+      // find playerandscore of the current player
+      const currentPlayerAndScore = playersAndScores.value.find(
+        (playerAndScore) => playerAndScore.name === props.currentPlayer.name
+      );
+
+      if (isYatzy() && hasAlreadyOneYatzy(currentPlayerAndScore)) {
+        isSecondYatzyDialogOpen.value = true;
+      }
     }
   }
 );
@@ -203,40 +240,47 @@ const saveScore = (selectedField) => {
   // key in the score object. e.g., 'ones', 'twos', 'twoPairs, 'threeOfAKind' etc.
   const fieldKey = toCamelCase(selectedField);
 
-  // for fields 'ones', 'twos', 'threes', 'fours', 'fives', 'sixes',
-  // the score is the sum of the dice that match the selected field
-  const numberFields = ["ones", "twos", "threes", "fours", "fives", "sixes"];
+  if (hasAlreadyOneYatzy(currentPlayerAndScore)) {
+    // sum of the dic
+    if (isYatzy()) {
+      score = getSecondYatzyScore(fieldKey);
+    }
+  } else {
+    // for fields 'ones', 'twos', 'threes', 'fours', 'fives', 'sixes',
+    // the score is the sum of the dice that match the selected field
+    const numberFields = ["ones", "twos", "threes", "fours", "fives", "sixes"];
 
-  if (numberFields.includes(fieldKey)) {
-    score = getNumberFieldScore(fieldKey);
-  }
+    if (numberFields.includes(fieldKey)) {
+      score = getNumberFieldScore(fieldKey);
+    }
 
-  if (fieldKey === "threeOfAKind") {
-    score = getThreeOrFourOfAKindScore(3);
-  }
+    if (fieldKey === "threeOfAKind") {
+      score = getThreeOrFourOfAKindScore(3);
+    }
 
-  if (fieldKey === "fourOfAKind") {
-    score = getThreeOrFourOfAKindScore(4);
-  }
+    if (fieldKey === "fourOfAKind") {
+      score = getThreeOrFourOfAKindScore(4);
+    }
 
-  if (fieldKey === "fullHouse") {
-    score = getFullHouseScore();
-  }
+    if (fieldKey === "fullHouse") {
+      score = getFullHouseScore();
+    }
 
-  if (fieldKey === "smallStraight") {
-    score = getStraightScore(4);
-  }
+    if (fieldKey === "smallStraight") {
+      score = getStraightScore(4);
+    }
 
-  if (fieldKey === "largeStraight") {
-    score = getStraightScore(5);
-  }
+    if (fieldKey === "largeStraight") {
+      score = getStraightScore(5);
+    }
 
-  if (fieldKey === "chance") {
-    score = getSumOfAllDice();
-  }
+    if (fieldKey === "chance") {
+      score = getSumOfAllDice();
+    }
 
-  if (fieldKey === "yatzy") {
-    score = getYatzyScore();
+    if (fieldKey === "yatzy") {
+      score = getYatzyScore();
+    }
   }
 
   // update the score of the current player. the selected score saving field is the key of the score object
@@ -328,16 +372,50 @@ const getStraightScore = (lengthOfStraight) => {
 };
 
 const getYatzyScore = () => {
-  const diceValues = props.dice.map((die) => die.value);
-  const largestNumberOfSameValues = getLargestNumberOfSameValues(diceValues);
-
-  // if the condition is met, return 50
-  if (largestNumberOfSameValues === 5) {
+  if (isYatzy()) {
     return 50;
   }
 
   // if the condition is not met, return 0
   return 0;
+};
+
+const isYatzy = () => {
+  const diceValues = props.dice.map((die) => die.value);
+  // const diceValues = [1, 1, 1, 1, 1];
+  const largestNumberOfSameValues = getLargestNumberOfSameValues(diceValues);
+
+  return largestNumberOfSameValues === 5;
+};
+
+const getSecondYatzyScore = (selectedField) => {
+  // if the condition is not met, return 0
+  switch (selectedField) {
+    case "ones":
+      return 5;
+    case "twos":
+      return 10;
+    case "threes":
+      return 15;
+    case "fours":
+      return 20;
+    case "fives":
+      return 25;
+    case "sixes":
+      return 30;
+    case "threeOfAKind":
+      return 30;
+    case "fourOfAKind":
+      return 30;
+    case "fullHouse":
+      return 25;
+    case "smallStraight":
+      return 30;
+    case "largeStraight":
+      return 40;
+    case "chance":
+      return 30;
+  }
 };
 
 const getSumOfAllDice = () => {
@@ -374,8 +452,6 @@ const countTotal = (playerAndScore) => {
   }
 
   playerAndScore.total = total;
-
-  console.log(total);
 };
 
 const allFieldsFilled = (playerAndScore) => {
@@ -386,6 +462,10 @@ const allFieldsFilled = (playerAndScore) => {
   }
 
   return true;
+};
+
+const hasAlreadyOneYatzy = (playerAndScore) => {
+  return playerAndScore.scores.yatzy !== null;
 };
 </script>
 

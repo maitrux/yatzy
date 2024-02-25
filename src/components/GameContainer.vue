@@ -102,6 +102,7 @@
         :currentPlayer="currentPlayer"
         :dice="dice"
         :isGameReset="isGameReset"
+        :numberOfRolls="numberOfRolls"
         @swithPlayer="onSwitchPlayer"
       />
     </v-row>
