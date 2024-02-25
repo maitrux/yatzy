@@ -77,7 +77,7 @@
           color="primary"
           >mdi-party-popper</v-icon
         >
-        <div class="mb-2 font-weight-bold">Woop! Yatzy again!</div>
+        <div class="mb-2 font-weight-bold">Woop! Yatzy!</div>
         <div>Select any field and get the maximum score of that field.</div>
       </v-card-text>
     </v-card>
