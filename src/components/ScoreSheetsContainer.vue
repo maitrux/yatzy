@@ -247,49 +247,59 @@ const saveScore = (selectedField) => {
     // sum of the dic
     if (isYatzy()) {
       score = getSecondYatzyScore(fieldKey);
+    } else {
+      score = setNormalScore(fieldKey);
     }
   } else {
     // for fields 'ones', 'twos', 'threes', 'fours', 'fives', 'sixes',
     // the score is the sum of the dice that match the selected field
-    const numberFields = ["ones", "twos", "threes", "fours", "fives", "sixes"];
-
-    if (numberFields.includes(fieldKey)) {
-      score = getNumberFieldScore(fieldKey);
-    }
-
-    if (fieldKey === "threeOfAKind") {
-      score = getThreeOrFourOfAKindScore(3);
-    }
-
-    if (fieldKey === "fourOfAKind") {
-      score = getThreeOrFourOfAKindScore(4);
-    }
-
-    if (fieldKey === "fullHouse") {
-      score = getFullHouseScore();
-    }
-
-    if (fieldKey === "smallStraight") {
-      score = getStraightScore(4);
-    }
-
-    if (fieldKey === "largeStraight") {
-      score = getStraightScore(5);
-    }
-
-    if (fieldKey === "chance") {
-      score = getSumOfAllDice();
-    }
-
-    if (fieldKey === "yatzy") {
-      score = getYatzyScore();
-    }
+    score = setNormalScore(fieldKey);
   }
 
   // update the score of the current player. the selected score saving field is the key of the score object
   currentPlayerAndScore.scores[fieldKey] = score;
 
   emit("swithPlayer");
+};
+
+const setNormalScore = (fieldKey) => {
+  let score = 0;
+
+  const numberFields = ["ones", "twos", "threes", "fours", "fives", "sixes"];
+
+  if (numberFields.includes(fieldKey)) {
+    score = getNumberFieldScore(fieldKey);
+  }
+
+  if (fieldKey === "threeOfAKind") {
+    score = getThreeOrFourOfAKindScore(3);
+  }
+
+  if (fieldKey === "fourOfAKind") {
+    score = getThreeOrFourOfAKindScore(4);
+  }
+
+  if (fieldKey === "fullHouse") {
+    score = getFullHouseScore();
+  }
+
+  if (fieldKey === "smallStraight") {
+    score = getStraightScore(4);
+  }
+
+  if (fieldKey === "largeStraight") {
+    score = getStraightScore(5);
+  }
+
+  if (fieldKey === "chance") {
+    score = getSumOfAllDice();
+  }
+
+  if (fieldKey === "yatzy") {
+    score = getYatzyScore();
+  }
+
+  return score;
 };
 
 const getNumberFieldScore = (fieldKey) => {
