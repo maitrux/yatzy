@@ -23,7 +23,10 @@
               density="compact"
               icon="mdi-plus"
               color="primary"
-              :disabled="playerAndScore.name !== props.currentPlayer.name"
+              :disabled="
+                playerAndScore.name !== props.currentPlayer.name ||
+                props.numberOfRolls === 0
+              "
               @click="saveScore(field)"
             >
             </v-btn>
