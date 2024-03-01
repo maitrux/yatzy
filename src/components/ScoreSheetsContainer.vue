@@ -89,6 +89,7 @@
 
 <script setup>
 import { ref, defineProps, defineEmits, watch } from "vue";
+import { ScoreSheet } from "../ScoreSheet.ts";
 
 const props = defineProps({
   currentPlayer: Object,
@@ -163,15 +164,6 @@ const playersAndScores = ref([
   // },
 ]);
 
-const mapSelectedFieldToNumber = {
-  ones: 1,
-  twos: 2,
-  threes: 3,
-  fours: 4,
-  fives: 5,
-  sixes: 6,
-};
-
 const fieldsAsTitles = {
   ones: "Ones (1 for each)",
   twos: "Twos (2 for each)",
@@ -216,7 +208,12 @@ watch(
         (playerAndScore) => playerAndScore.name === props.currentPlayer.name
       );
 
-      if (isYatzy() && hasAlreadyOneYatzy(currentPlayerAndScore)) {
+      const diceValues = props.dice.map((die) => die.value);
+
+      if (
+        ScoreSheet.isYatzy(diceValues) &&
+        hasAlreadyOneYatzy(currentPlayerAndScore)
+      ) {
         isSecondYatzyDialogOpen.value = true;
       }
     }
@@ -243,202 +240,22 @@ const saveScore = (selectedField) => {
   // key in the score object. e.g., 'ones', 'twos', 'twoPairs, 'threeOfAKind' etc.
   const fieldKey = toCamelCase(selectedField);
 
+  const diceValues = props.dice.map((die) => die.value);
+
   if (hasAlreadyOneYatzy(currentPlayerAndScore)) {
-    // sum of the dic
-    if (isYatzy()) {
-      score = getSecondYatzyScore(fieldKey);
+    if (ScoreSheet.isYatzy(diceValues)) {
+      score = ScoreSheet.getHighestPossibleScoreOfField(fieldKey);
     } else {
-      score = setNormalScore(fieldKey);
+      score = ScoreSheet.getScore(fieldKey, diceValues);
     }
   } else {
-    // for fields 'ones', 'twos', 'threes', 'fours', 'fives', 'sixes',
-    // the score is the sum of the dice that match the selected field
-    score = setNormalScore(fieldKey);
+    score = ScoreSheet.getScore(fieldKey, diceValues);
   }
 
   // update the score of the current player. the selected score saving field is the key of the score object
   currentPlayerAndScore.scores[fieldKey] = score;
 
   emit("swithPlayer");
-};
-
-const setNormalScore = (fieldKey) => {
-  let score = 0;
-
-  const numberFields = ["ones", "twos", "threes", "fours", "fives", "sixes"];
-
-  if (numberFields.includes(fieldKey)) {
-    score = getNumberFieldScore(fieldKey);
-  }
-
-  if (fieldKey === "threeOfAKind") {
-    score = getThreeOrFourOfAKindScore(3);
-  }
-
-  if (fieldKey === "fourOfAKind") {
-    score = getThreeOrFourOfAKindScore(4);
-  }
-
-  if (fieldKey === "fullHouse") {
-    score = getFullHouseScore();
-  }
-
-  if (fieldKey === "smallStraight") {
-    score = getStraightScore(4);
-  }
-
-  if (fieldKey === "largeStraight") {
-    score = getStraightScore(5);
-  }
-
-  if (fieldKey === "chance") {
-    score = getSumOfAllDice();
-  }
-
-  if (fieldKey === "yatzy") {
-    score = getYatzyScore();
-  }
-
-  return score;
-};
-
-const getNumberFieldScore = (fieldKey) => {
-  let multiplier = 0;
-
-  const selectedFieldAsNumber = mapSelectedFieldToNumber[fieldKey];
-
-  props.dice.forEach((die) => {
-    if (die.value === mapSelectedFieldToNumber[fieldKey]) {
-      multiplier++;
-    }
-  });
-
-  return multiplier * selectedFieldAsNumber;
-};
-
-const getThreeOrFourOfAKindScore = (numberOfDiceThatNeedToMatch) => {
-  const diceValues = props.dice.map((die) => die.value);
-  const largestNumberOfSameValues = getLargestNumberOfSameValues(diceValues);
-
-  // check if the condition of 'three of a kind' or 'four of a kind' is met
-  // if not, return 0
-  if (largestNumberOfSameValues < numberOfDiceThatNeedToMatch) {
-    return 0;
-  }
-
-  // if the condition is met, return the sum of all dice
-  return getSumOfAllDice();
-};
-
-const getLargestNumberOfSameValues = (arr) => {
-  const count = {};
-  let maxCount = 0;
-
-  arr.forEach((num) => {
-    count[num] = (count[num] || 0) + 1;
-    maxCount = Math.max(maxCount, count[num]);
-  });
-
-  return maxCount;
-};
-
-const getFullHouseScore = () => {
-  const diceValues = props.dice.map((die) => die.value);
-  const count = {};
-
-  diceValues.forEach((num) => {
-    count[num] = (count[num] || 0) + 1;
-  });
-
-  const values = Object.values(count);
-
-  // if the condition is met, return 25
-  if (values.includes(3) && values.includes(2)) {
-    return 25;
-  }
-
-  // if the condition is not met, return 0
-  return 0;
-};
-
-const getStraightScore = (lengthOfStraight) => {
-  const diceValues = props.dice.map((die) => die.value);
-  const sortedDice = diceValues.sort((a, b) => a - b);
-
-  // small straight: [1, 2, 3, 4] or [2, 3, 4, 5] or [3, 4, 5, 6]
-  // large straight: [1, 2, 3, 4, 5] or [2, 3, 4, 5, 6]
-
-  let numberOfConsecutiveNumbers = 1;
-
-  sortedDice.forEach((die, i) => {
-    if (die === sortedDice[i + 1] - 1) {
-      numberOfConsecutiveNumbers++;
-    }
-  });
-
-  // Return the corresponding score
-  if (numberOfConsecutiveNumbers >= lengthOfStraight) {
-    return lengthOfStraight === 4 ? 30 : 40; // Large or small straight score
-  } else {
-    return 0; // Not a valid straight
-  }
-};
-
-const getYatzyScore = () => {
-  if (isYatzy()) {
-    return 50;
-  }
-
-  // if the condition is not met, return 0
-  return 0;
-};
-
-const isYatzy = () => {
-  const diceValues = props.dice.map((die) => die.value);
-  // const diceValues = [1, 1, 1, 1, 1];
-  const largestNumberOfSameValues = getLargestNumberOfSameValues(diceValues);
-
-  return largestNumberOfSameValues === 5;
-};
-
-const getSecondYatzyScore = (selectedField) => {
-  // if the condition is not met, return 0
-  switch (selectedField) {
-    case "ones":
-      return 5;
-    case "twos":
-      return 10;
-    case "threes":
-      return 15;
-    case "fours":
-      return 20;
-    case "fives":
-      return 25;
-    case "sixes":
-      return 30;
-    case "threeOfAKind":
-      return 30;
-    case "fourOfAKind":
-      return 30;
-    case "fullHouse":
-      return 25;
-    case "smallStraight":
-      return 30;
-    case "largeStraight":
-      return 40;
-    case "chance":
-      return 30;
-  }
-};
-
-const getSumOfAllDice = () => {
-  let sum = 0;
-
-  props.dice.forEach((die) => {
-    sum += die.value;
-  });
-
-  return sum;
 };
 
 const countTotal = (playerAndScore) => {
