@@ -67,7 +67,7 @@
   </v-col>
 
   <v-dialog
-    v-model="isSecondYatzyDialogOpen"
+    v-model="isYatzyDialogOpen"
     max-width="300px"
   >
     <v-card>
@@ -80,8 +80,8 @@
           color="primary"
           >mdi-party-popper</v-icon
         >
-        <div class="mb-2 font-weight-bold">Woop! Yatzy!</div>
-        <div>Select any field and get the maximum score of that field.</div>
+        <div class="mb-2 font-weight-bold">Woop! You got a Yatzy!</div>
+        <div v-if="yatzyDialogText">{{ yatzyDialogText }}</div>
       </v-card-text>
     </v-card>
   </v-dialog>
@@ -180,7 +180,9 @@ const fieldsAsTitles = {
   yatzy: "Yatzy (50 points)",
 };
 
-const isSecondYatzyDialogOpen = ref(false);
+const isYatzyDialogOpen = ref(false);
+
+const yatzyDialogText = ref("");
 
 // watch isGameReset to reset the game
 watch(
@@ -210,11 +212,19 @@ watch(
 
       const diceValues = props.dice.map((die) => die.value);
 
-      if (
-        ScoreSheet.isYatzy(diceValues) &&
-        currentPlayerAndScore.scores.yatzy !== null
-      ) {
-        isSecondYatzyDialogOpen.value = true;
+      if (ScoreSheet.isYatzy(diceValues)) {
+        isYatzyDialogOpen.value = true;
+
+        setTimeout(() => {
+          isYatzyDialogOpen.value = false;
+        }, 2000);
+      }
+
+      if (currentPlayerAndScore.scores.yatzy !== null) {
+        yatzyDialogText.value =
+          "Select any field and get the maximum score of that field.";
+      } else {
+        yatzyDialogText.value = "";
       }
     }
   }
