@@ -88,7 +88,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits, watch } from "vue";
+import { ref, defineProps, defineEmits, watch, defineExpose } from "vue";
 import { ScoreSheet } from "../ScoreSheet.ts";
 
 const props = defineProps({
@@ -96,7 +96,6 @@ const props = defineProps({
   totalScore: Number,
   dice: Array,
   numberOfRolls: Number,
-  isGameReset: Boolean,
 });
 
 const emit = defineEmits(["swithPlayer"]);
@@ -183,22 +182,6 @@ const fieldsAsTitles = {
 const isYatzyDialogOpen = ref(false);
 
 const yatzyDialogText = ref("");
-
-// watch isGameReset to reset the game
-watch(
-  () => props.isGameReset,
-  (newValue) => {
-    if (newValue && props.isGameReset === true) {
-      playersAndScores.value.forEach((playerAndScore) => {
-        for (const score in playerAndScore.scores) {
-          playerAndScore.scores[score] = null;
-        }
-        playerAndScore.bonus = 0;
-        playerAndScore.total = 0;
-      });
-    }
-  }
-);
 
 // watch number of rolls to detect if the dice were thrown again
 watch(
@@ -290,6 +273,20 @@ const areAllFieldsFilled = (playerAndScore) => {
 
   return true;
 };
+
+const resetGame = () => {
+  playersAndScores.value.forEach((playerAndScore) => {
+    for (const score in playerAndScore.scores) {
+      playerAndScore.scores[score] = null;
+    }
+    playerAndScore.bonus = 0;
+    playerAndScore.total = 0;
+  });
+};
+
+defineExpose({
+  resetGame,
+});
 </script>
 
 <style scoped>

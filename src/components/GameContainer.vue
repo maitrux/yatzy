@@ -99,9 +99,9 @@
 
       <!-- Score sheets -->
       <ScoreSheetsContainer
+        ref="scoreSheetContainer"
         :currentPlayer="currentPlayer"
         :dice="dice"
-        :isGameReset="isGameReset"
         :numberOfRolls="numberOfRolls"
         @swithPlayer="onSwitchPlayer"
       />
@@ -112,8 +112,6 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import ScoreSheetsContainer from "./ScoreSheetsContainer.vue";
-
-const isGameReset = ref(false);
 
 const players = ref([
   { name: "Player 1", turn: true },
@@ -129,6 +127,9 @@ const dice = [ref(0), ref(0), ref(0), ref(0), ref(0)];
 const selectedDice = ref([]);
 
 const expand = ref(false);
+
+// ref to the DOM element of the child component
+const scoreSheetContainer = ref(null);
 
 // when number of rolls is 3, switch to next player
 const onSwitchPlayer = () => {
@@ -191,11 +192,7 @@ const resetGame = () => {
   players.value[0].turn = true;
   currentPlayer.value = players.value[0];
 
-  isGameReset.value = true;
-
-  setTimeout(() => {
-    isGameReset.value = false;
-  }, 50);
+  scoreSheetContainer.value.resetGame();
 };
 </script>
 
