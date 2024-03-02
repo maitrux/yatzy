@@ -169,10 +169,14 @@ const rollTheDice = () => {
       die.value = Math.floor(Math.random() * 6) + 1;
     });
   } else {
+    // roll only the selected dice
     selectedDice.value.forEach((i) => {
       dice[i].value = Math.floor(Math.random() * 6) + 1;
     });
   }
+
+  // check if yatzy and show the dialog if it is
+  scoreSheetContainer.value.showYatzyDialogIfYatzy();
 
   numberOfRolls.value++;
   selectedDice.value = [];

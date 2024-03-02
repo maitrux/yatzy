@@ -88,7 +88,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, defineEmits, watch, defineExpose } from "vue";
+import { ref, defineProps, defineEmits, defineExpose } from "vue";
 import { ScoreSheet } from "../ScoreSheet.ts";
 
 const props = defineProps({
@@ -183,36 +183,6 @@ const isYatzyDialogOpen = ref(false);
 
 const yatzyDialogText = ref("");
 
-// watch number of rolls to detect if the dice were thrown again
-watch(
-  () => props.numberOfRolls,
-  (newValue) => {
-    if (newValue) {
-      // find playerandscore of the current player
-      const currentPlayerAndScore = playersAndScores.value.find(
-        (playerAndScore) => playerAndScore.name === props.currentPlayer.name
-      );
-
-      const diceValues = props.dice.map((die) => die.value);
-
-      if (ScoreSheet.isYatzy(diceValues)) {
-        isYatzyDialogOpen.value = true;
-
-        setTimeout(() => {
-          isYatzyDialogOpen.value = false;
-        }, 2000);
-      }
-
-      if (currentPlayerAndScore.scores.yatzy !== null) {
-        yatzyDialogText.value =
-          "Select any field and get the maximum score of that field.";
-      } else {
-        yatzyDialogText.value = "";
-      }
-    }
-  }
-);
-
 const mapFieldToTitle = (field) => {
   return fieldsAsTitles[field];
 };
@@ -284,8 +254,32 @@ const resetGame = () => {
   });
 };
 
+const showYatzyDialogIfYatzy = () => {
+  const currentPlayerAndScore = playersAndScores.value.find(
+    (playerAndScore) => playerAndScore.name === props.currentPlayer.name
+  );
+
+  const diceValues = props.dice.map((die) => die.value);
+
+  if (ScoreSheet.isYatzy(diceValues)) {
+    isYatzyDialogOpen.value = true;
+
+    setTimeout(() => {
+      isYatzyDialogOpen.value = false;
+    }, 2000);
+  }
+
+  if (currentPlayerAndScore.scores.yatzy !== null) {
+    yatzyDialogText.value =
+      "Select any field and get the maximum score of that field.";
+  } else {
+    yatzyDialogText.value = "";
+  }
+};
+
 defineExpose({
   resetGame,
+  showYatzyDialogIfYatzy,
 });
 </script>
 
