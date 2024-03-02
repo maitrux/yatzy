@@ -1,6 +1,34 @@
 import { ScoreSheet } from "@/ScoreSheet";
 
-// number fields
+describe("getScore()", () => {
+  it("should return 3", () => {
+    const result = ScoreSheet.getScore(false, "ones", [1, 1, 2, 3, 1]);
+    expect(result).toBe(3);
+  });
+
+  it("should return 50", () => {
+    const result = ScoreSheet.getScore(false, "yatzy", [6, 6, 6, 6, 6]);
+    expect(result).toBe(50);
+  });
+
+  it("should return 15", () => {
+    const result = ScoreSheet.getScore(false, "chance", [1, 2, 3, 4, 5]);
+    expect(result).toBe(15);
+  });
+
+  // should return the "fullHouse" score 25 if the yatzy field is not taken
+  it("should return 25", () => {
+    const result = ScoreSheet.getScore(false, "fullHouse", [1, 2, 1, 2, 1]);
+    expect(result).toBe(25);
+  });
+
+  // should return the highest score of "fullHouse" if the yatzy field is already taken
+  it("should return 25", () => {
+    const result = ScoreSheet.getScore(true, "fullHouse", [1, 1, 1, 1, 1]);
+    expect(result).toBe(25);
+  });
+});
+
 describe("getNumberFieldScore()", () => {
   it("should return 3", () => {
     const result = ScoreSheet.getNumberFieldScore("ones", [1, 1, 2, 3, 1]);

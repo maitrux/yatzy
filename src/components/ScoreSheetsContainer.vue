@@ -242,15 +242,9 @@ const saveScore = (selectedField) => {
 
   const diceValues = props.dice.map((die) => die.value);
 
-  if (hasAlreadyOneYatzy(currentPlayerAndScore)) {
-    if (ScoreSheet.isYatzy(diceValues)) {
-      score = ScoreSheet.getHighestPossibleScoreOfField(fieldKey);
-    } else {
-      score = ScoreSheet.getScore(fieldKey, diceValues);
-    }
-  } else {
-    score = ScoreSheet.getScore(fieldKey, diceValues);
-  }
+  const isYatzyFieldFilled = currentPlayerAndScore.scores.yatzy !== null;
+
+  score = ScoreSheet.getScore(isYatzyFieldFilled, fieldKey, diceValues);
 
   // update the score of the current player. the selected score saving field is the key of the score object
   currentPlayerAndScore.scores[fieldKey] = score;

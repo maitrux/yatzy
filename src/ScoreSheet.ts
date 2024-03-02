@@ -1,5 +1,19 @@
 export class ScoreSheet {
-  static getScore(fieldKey: string, diceValues: number[]): number {
+  static getScore(
+    yatzyFieldIsFilled: boolean,
+    fieldKey: string,
+    diceValues: number[]
+  ): number {
+    // If the player has not yet filled the yatzy field or the current roll does not result in a Yatzy
+    if (!yatzyFieldIsFilled || !ScoreSheet.isYatzy(diceValues)) {
+      return ScoreSheet.getScoreForField(fieldKey, diceValues);
+    } else {
+      // If the player has already scored a Yatzy and the current roll results in a Yatzy
+      return ScoreSheet.getHighestPossibleScoreForField(fieldKey);
+    }
+  }
+
+  static getScoreForField(fieldKey: string, diceValues: number[]): number {
     let score = 0;
 
     const numberFields = ["ones", "twos", "threes", "fours", "fives", "sixes"];
@@ -165,7 +179,7 @@ export class ScoreSheet {
    * @param selectedField e.g. 'ones', 'threeOfAKind', 'fullHouse' etc.
    * @return the highest possible score of the selected field
    */
-  static getHighestPossibleScoreOfField(selectedField: string): number {
+  static getHighestPossibleScoreForField(selectedField: string): number {
     switch (selectedField) {
       case "ones":
         return 5;
