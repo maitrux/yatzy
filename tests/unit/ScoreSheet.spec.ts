@@ -115,3 +115,30 @@ describe("getSumOfAllDice()", () => {
     expect(result).toBe(30);
   });
 });
+
+describe("getSumOfScores()", () => {
+  it("should return 113", () => {
+    const result = ScoreSheet.getSumOfScores([17, 25, 45, 12, 14]);
+    expect(result).toBe(113);
+  });
+});
+
+describe("getTotalScore()", () => {
+  // total score without bonus
+  it("should return 235", () => {
+    const result = ScoreSheet.getTotalScore(
+      [3, 6, 9, 12, 15, 0, 0, 24, 25, 30, 40, 18, 0],
+      [3, 6, 9, 12, 15, 0]
+    );
+    expect(result).toBe(182);
+  });
+
+  // total score with bonus
+  it("should return 235", () => {
+    const result = ScoreSheet.getTotalScore(
+      [3, 6, 9, 12, 15, 18, 0, 24, 25, 30, 40, 18, 0],
+      [3, 6, 9, 12, 15, 18]
+    );
+    expect(result).toBe(200 + 35);
+  });
+});

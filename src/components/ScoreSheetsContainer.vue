@@ -39,11 +39,11 @@
           </div>
         </div>
 
-        <div v-if="allFieldsFilled(playerAndScore)">
+        <div v-if="areAllFieldsFilled(playerAndScore)">
           <v-btn
             class="mt-4"
             color="primary"
-            @click="countTotal(playerAndScore)"
+            @click="getTotalScore(playerAndScore)"
           >
             Count total
           </v-btn>
@@ -143,7 +143,7 @@ const playersAndScores = ref([
     total: 0,
   },
   // {
-  //   name: "Player 1",
+  //   name: "Player 2",
   //   scores: {
   //     ones: 3,
   //     twos: 12,
@@ -212,7 +212,7 @@ watch(
 
       if (
         ScoreSheet.isYatzy(diceValues) &&
-        hasAlreadyOneYatzy(currentPlayerAndScore)
+        currentPlayerAndScore.scores.yatzy !== null
       ) {
         isSecondYatzyDialogOpen.value = true;
       }
@@ -240,7 +240,8 @@ const saveScore = (selectedField) => {
   // key in the score object. e.g., 'ones', 'twos', 'twoPairs, 'threeOfAKind' etc.
   const fieldKey = toCamelCase(selectedField);
 
-  const diceValues = props.dice.map((die) => die.value);
+  // const diceValues = props.dice.map((die) => die.value);
+  const diceValues = [1, 1, 1, 1, 1];
 
   const isYatzyFieldFilled = currentPlayerAndScore.scores.yatzy !== null;
 
@@ -252,33 +253,26 @@ const saveScore = (selectedField) => {
   emit("swithPlayer");
 };
 
-const countTotal = (playerAndScore) => {
-  let total = 0;
+const getTotalScore = (playerAndScore) => {
+  const totalOfAllFields = ScoreSheet.getSumOfScores(playerAndScore.scores);
 
-  for (const score in playerAndScore.scores) {
-    if (playerAndScore.scores[score] !== null) {
-      total += playerAndScore.scores[score];
-    }
-  }
-
-  // check if the total of const numberFields = ["ones", "twos", "threes", "fours", "fives", "sixes"] is greater than or equal to 63
   const numberFields = ["ones", "twos", "threes", "fours", "fives", "sixes"];
-  let sumOfNumberFields = 0;
-  if (numberFields.every((field) => playerAndScore.scores[field] !== null)) {
-    numberFields.forEach((field) => {
-      sumOfNumberFields += playerAndScore.scores[field];
-    });
 
-    if (sumOfNumberFields >= 63) {
-      playerAndScore.bonus = 35;
-      total += 35;
-    }
-  }
+  // map all the number field values to an array of numbers
+  const numberFieldValues = numberFields.map(
+    (field) => playerAndScore.scores[field]
+  );
 
-  playerAndScore.total = total;
+  const totalOfNumberFields = ScoreSheet.getSumOfScores(numberFieldValues);
+
+  playerAndScore.bonus = totalOfNumberFields >= 63 ? 35 : 0;
+  playerAndScore.total = ScoreSheet.getTotalScore(
+    totalOfAllFields,
+    totalOfNumberFields
+  );
 };
 
-const allFieldsFilled = (playerAndScore) => {
+const areAllFieldsFilled = (playerAndScore) => {
   for (const score in playerAndScore.scores) {
     if (playerAndScore.scores[score] === null) {
       return false;
@@ -286,10 +280,6 @@ const allFieldsFilled = (playerAndScore) => {
   }
 
   return true;
-};
-
-const hasAlreadyOneYatzy = (playerAndScore) => {
-  return playerAndScore.scores.yatzy !== null;
 };
 </script>
 

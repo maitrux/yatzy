@@ -210,6 +210,19 @@ export class ScoreSheet {
     }
   }
 
+  static getTotalScore(scores: number[], numberFieldScores: number[]): number {
+    let total = 0;
+
+    total += this.getSumOfScores(scores);
+
+    // Add the bonus if the sum of the number fields is 63 or higher
+    if (this.getSumOfScores(numberFieldScores) >= 63) {
+      total += 35;
+    }
+
+    return total;
+  }
+
   // HELPER FUNCTONS
 
   /** Check if is a yatzy
@@ -251,5 +264,19 @@ export class ScoreSheet {
     });
 
     return maxCount;
+  }
+
+  /** Get the sum of scores
+   * @param scores array of numbers
+   * @return the sum of all scores
+   */
+  static getSumOfScores(scores: number[]): number {
+    let sum = 0;
+
+    scores.forEach((value) => {
+      sum += value;
+    });
+
+    return sum;
   }
 }
