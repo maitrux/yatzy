@@ -240,8 +240,7 @@ const saveScore = (selectedField) => {
   // key in the score object. e.g., 'ones', 'twos', 'twoPairs, 'threeOfAKind' etc.
   const fieldKey = toCamelCase(selectedField);
 
-  // const diceValues = props.dice.map((die) => die.value);
-  const diceValues = [1, 1, 1, 1, 1];
+  const diceValues = props.dice.map((die) => die.value);
 
   const isYatzyFieldFilled = currentPlayerAndScore.scores.yatzy !== null;
 
