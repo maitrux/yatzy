@@ -141,9 +141,11 @@ onMounted(() => {
 });
 
 const onSwitchPlayer = () => {
-  const nextPlayer = players.value.find(
-    (player) => player.name !== currentPlayer.value.name
-  );
+  // find next player in the array
+  const nextPlayer =
+    players.value[
+      (players.value.indexOf(currentPlayer.value) + 1) % players.value.length
+    ];
 
   currentPlayer.value = nextPlayer;
   numberOfRolls.value = 0;
