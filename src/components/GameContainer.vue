@@ -131,13 +131,16 @@ const expand = ref(false);
 // ref to the DOM element of the child component
 const scoreSheetContainer = ref(null);
 
-// when number of rolls is 3, switch to next player
-const onSwitchPlayer = () => {
-  // reset dice and number of rolls
-  dice.forEach((die) => (die.value = 0));
-  numberOfRolls.value = 0;
-  selectedDice.value = [];
+// roll the dice when pressing enter
+onMounted(() => {
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      rollTheDice();
+    }
+  });
+});
 
+const onSwitchPlayer = () => {
   const nextPlayer = players.value.find(
     (player) => player.name !== currentPlayer.value.name
   );
@@ -152,15 +155,10 @@ const onSwitchPlayer = () => {
       player.turn = false;
     }
   });
-};
 
-onMounted(() => {
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      rollTheDice();
-    }
-  });
-});
+  // reset dice and number of rolls in the end of the turn
+  resetDiceAndNumOfRolls();
+};
 
 const rollTheDice = () => {
   // if first roll, roll all dice
@@ -184,9 +182,7 @@ const rollTheDice = () => {
 
 const resetGame = () => {
   // reset dice and number of rolls
-  dice.forEach((die) => (die.value = 0));
-  numberOfRolls.value = 0;
-  selectedDice.value = [];
+  resetDiceAndNumOfRolls();
 
   // reset players
   players.value.forEach((player) => {
@@ -196,7 +192,14 @@ const resetGame = () => {
   players.value[0].turn = true;
   currentPlayer.value = players.value[0];
 
-  scoreSheetContainer.value.resetGame();
+  // reset the score sheets
+  scoreSheetContainer.value.resetScoreSheets();
+};
+
+const resetDiceAndNumOfRolls = () => {
+  dice.forEach((die) => (die.value = 0));
+  numberOfRolls.value = 0;
+  selectedDice.value = [];
 };
 </script>
 

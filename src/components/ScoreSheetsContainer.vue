@@ -244,7 +244,7 @@ const areAllFieldsFilled = (playerAndScore) => {
   return true;
 };
 
-const resetGame = () => {
+const resetScoreSheets = () => {
   playersAndScores.value.forEach((playerAndScore) => {
     for (const score in playerAndScore.scores) {
       playerAndScore.scores[score] = null;
@@ -278,7 +278,7 @@ const showYatzyDialogIfYatzy = () => {
 };
 
 defineExpose({
-  resetGame,
+  resetScoreSheets,
   showYatzyDialogIfYatzy,
 });
 </script>
