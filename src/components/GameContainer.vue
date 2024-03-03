@@ -1,9 +1,10 @@
 <template>
   <div class="app-container">
-    <v-row>
+    <v-row :justify-sm="players.length % 2 !== 0 ? 'space-between' : 'start'">
       <v-col
         xs="12"
-        sm="4"
+        sm="12"
+        md="4"
       >
         <v-card class="dice-container">
           <v-card-text
@@ -11,20 +12,21 @@
             style="height: 100%"
           >
             <div>
-              <div class="d-flex mb-8 justify-center">
-                <div
+              <div
+                v-if="players.length"
+                class="d-flex mb-8 justify-center align-center"
+              >
+                <v-icon class="mr-4">mdi-dice-multiple-outline</v-icon>
+                <v-chip
+                  v-show="player.turn"
                   v-for="player in players"
                   :key="player.name"
+                  class="mr-4"
+                  label
+                  :color="player.turn ? 'primary' : 'grey'"
                 >
-                  <v-chip
-                    :key="player.name"
-                    class="mr-4"
-                    label
-                    :color="player.turn ? 'primary' : 'grey'"
-                  >
-                    <div class="font-weight-bold">{{ player.name }}</div>
-                  </v-chip>
-                </div>
+                  <div class="font-weight-bold">{{ player.name }}</div>
+                </v-chip>
               </div>
 
               <!-- Actions -->
@@ -100,23 +102,47 @@
       <!-- Score sheets -->
       <ScoreSheetsContainer
         ref="scoreSheetContainer"
+        :numberOfPlayers="players.length"
         :currentPlayer="currentPlayer"
         :dice="dice"
-        :numberOfRolls="numberOfRolls"
         @swithPlayer="onSwitchPlayer"
       />
     </v-row>
+
+    <v-dialog
+      v-model="isAddPlayersDialogOpen"
+      max-width="300px"
+      :persistent="true"
+    >
+      <v-card>
+        <v-card-text
+          class="pa-4"
+          style="text-align: center"
+        >
+          <v-text-field
+            v-model="numberOfPlayers"
+            label="Number of players"
+            min="1"
+            variant="outlined"
+          />
+          <v-btn
+            class="mt-4"
+            color="primary"
+            block
+            @click="addPlayers()"
+          >
+            Add players
+          </v-btn>
+        </v-card-text>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted } from "vue";
 import ScoreSheetsContainer from "./ScoreSheetsContainer.vue";
-
-const players = ref([
-  { name: "Player 1", turn: true },
-  { name: "Player 2", turn: false },
-]);
+const players = ref([]);
 
 const currentPlayer = ref(players.value[0]);
 
@@ -128,6 +154,10 @@ const selectedDice = ref([]);
 
 const expand = ref(false);
 
+const isAddPlayersDialogOpen = ref(false);
+
+const numberOfPlayers = ref(1);
+
 // ref to the DOM element of the child component
 const scoreSheetContainer = ref(null);
 
@@ -138,7 +168,30 @@ onMounted(() => {
       rollTheDice();
     }
   });
+
+  isAddPlayersDialogOpen.value = true;
 });
+
+const addPlayers = () => {
+  // Clear existing players
+  players.value = [];
+
+  // Add new players based on numberOfPlayers
+  for (let i = 0; i < numberOfPlayers.value; i++) {
+    players.value.push({
+      name: `Player ${i + 1}`,
+      turn: i === 0, // Set first player's turn to true
+    });
+  }
+
+  scoreSheetContainer.value.generatePlayersAndScores(numberOfPlayers.value);
+
+  // Set currentPlayer to the first player
+  currentPlayer.value = players.value[0];
+
+  // Close the dialog
+  isAddPlayersDialogOpen.value = false;
+};
 
 const onSwitchPlayer = () => {
   // find next player in the array
@@ -259,6 +312,8 @@ const resetDiceAndNumOfRolls = () => {
   @media screen and (min-width: 601px) {
     height: 630px;
   }
+
+  min-width: 327px;
 }
 
 .game-rules-container {

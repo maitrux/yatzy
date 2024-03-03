@@ -1,10 +1,12 @@
 <template>
   <!-- Score sheets -->
   <v-col
-    xs="12"
-    sm="4"
     v-for="playerAndScore in playersAndScores"
     :key="playerAndScore.name"
+    class="score-sheet"
+    xs="12"
+    sm="12"
+    md="4"
   >
     <v-card>
       <v-card-text>
@@ -92,76 +94,14 @@ import { ref, defineProps, defineEmits, defineExpose } from "vue";
 import { ScoreSheet } from "../ScoreSheet.ts";
 
 const props = defineProps({
+  numberOfPlayers: Number,
   currentPlayer: Object,
-  totalScore: Number,
   dice: Array,
-  numberOfRolls: Number,
 });
 
 const emit = defineEmits(["swithPlayer"]);
 
-const playersAndScores = ref([
-  {
-    name: "Player 1",
-    scores: {
-      ones: null,
-      twos: null,
-      threes: null,
-      fours: null,
-      fives: null,
-      sixes: null,
-      threeOfAKind: null,
-      fourOfAKind: null,
-      fullHouse: null,
-      smallStraight: null,
-      largeStraight: null,
-      chance: null,
-      yatzy: null,
-    },
-    bonus: 0,
-    total: 0,
-  },
-  {
-    name: "Player 2",
-    scores: {
-      ones: null,
-      twos: null,
-      threes: null,
-      fours: null,
-      fives: null,
-      sixes: null,
-      threeOfAKind: null,
-      fourOfAKind: null,
-      fullHouse: null,
-      smallStraight: null,
-      largeStraight: null,
-      chance: null,
-      yatzy: null,
-    },
-    bonus: 0,
-    total: 0,
-  },
-  // {
-  //   name: "Player 2",
-  //   scores: {
-  //     ones: 3,
-  //     twos: 12,
-  //     threes: 9,
-  //     fours: 16,
-  //     fives: 15,
-  //     sixes: 18,
-  //     threeOfAKind: null,
-  //     fourOfAKind: null,
-  //     fullHouse: null,
-  //     smallStraight: null,
-  //     largeStraight: null,
-  //     chance: null,
-  //     yatzy: null,
-  //   },
-  //   bonus: 0,
-  //   total: 0,
-  // },
-]);
+const playersAndScores = ref([]);
 
 const fieldsAsTitles = {
   ones: "Ones (1 for each)",
@@ -244,6 +184,36 @@ const areAllFieldsFilled = (playerAndScore) => {
   return true;
 };
 
+const generatePlayersAndScores = (numberOfPlayers) => {
+  const playersAndScoresArray = [];
+  for (let i = 1; i <= numberOfPlayers; i++) {
+    const player = {
+      name: `Player ${i}`,
+      scores: {
+        ones: null,
+        twos: null,
+        threes: null,
+        fours: null,
+        fives: null,
+        sixes: null,
+        threeOfAKind: null,
+        fourOfAKind: null,
+        fullHouse: null,
+        smallStraight: null,
+        largeStraight: null,
+        chance: null,
+        yatzy: null,
+      },
+      bonus: 0,
+      total: 0,
+    };
+
+    playersAndScoresArray.push(player);
+  }
+
+  playersAndScores.value = playersAndScoresArray;
+};
+
 const resetScoreSheets = () => {
   playersAndScores.value.forEach((playerAndScore) => {
     for (const score in playerAndScore.scores) {
@@ -278,6 +248,7 @@ const showYatzyDialogIfYatzy = () => {
 };
 
 defineExpose({
+  generatePlayersAndScores,
   resetScoreSheets,
   showYatzyDialogIfYatzy,
 });
@@ -303,5 +274,9 @@ defineExpose({
 .field-title {
   width: 250px;
   text-align: left;
+}
+
+.score-sheet {
+  min-width: 351px;
 }
 </style>
