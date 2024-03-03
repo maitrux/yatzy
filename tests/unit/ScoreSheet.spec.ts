@@ -35,7 +35,7 @@ describe("getNumberFieldScore()", () => {
     expect(result).toBe(3 * 1);
   });
 
-  it("should return 10", () => {
+  it("should return 4", () => {
     const result = ScoreSheet.getNumberFieldScore("twos", [2, 2, 3, 4, 5]);
     expect(result).toBe(2 * 2);
   });
