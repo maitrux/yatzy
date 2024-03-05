@@ -142,3 +142,11 @@ describe("getTotalScore()", () => {
     expect(result).toBe(200 + 35);
   });
 });
+
+describe("getRandomInt()", () => {
+  it("should return a number between 1 and 6", () => {
+    const result = ScoreSheet.getRandomInt(1, 6);
+    expect(result).toBeGreaterThanOrEqual(1);
+    expect(result).toBeLessThanOrEqual(6);
+  });
+});

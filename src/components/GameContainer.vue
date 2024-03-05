@@ -142,6 +142,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import ScoreSheetsContainer from "./ScoreSheetsContainer.vue";
+import { ScoreSheet } from "../ScoreSheet.ts";
+
 const players = ref([]);
 
 const currentPlayer = ref(players.value[0]);
@@ -219,12 +221,12 @@ const rollTheDice = () => {
   // if first roll, roll all dice
   if (numberOfRolls.value === 0 || selectedDice.value.length === 0) {
     dice.forEach((die) => {
-      die.value = Math.floor(Math.random() * 6) + 1;
+      die.value = ScoreSheet.getRandomInt(1, 6);
     });
   } else {
     // roll only the selected dice
     selectedDice.value.forEach((i) => {
-      dice[i].value = Math.floor(Math.random() * 6) + 1;
+      dice[i].value = ScoreSheet.getRandomInt(1, 6);
     });
   }
 
