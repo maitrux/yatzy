@@ -16,13 +16,33 @@ describe("getScore()", () => {
     expect(result).toBe(15);
   });
 
-  // should return the "fullHouse" score 25 if the yatzy field is not taken
+  it("should return 18", () => {
+    const result = ScoreSheet.getScore(false, "threeOfAKind", [3, 3, 3, 4, 5]);
+    expect(result).toBe(18);
+  });
+
+  it("should return 17", () => {
+    const result = ScoreSheet.getScore(false, "fourOfAKind", [3, 3, 3, 3, 5]);
+    expect(result).toBe(17);
+  });
+
+  it("should return 30", () => {
+    const result = ScoreSheet.getScore(false, "smallStraight", [5, 4, 2, 5, 3]);
+    expect(result).toBe(30);
+  });
+
+  it("should return 40", () => {
+    const result = ScoreSheet.getScore(false, "largeStraight", [1, 5, 3, 2, 4]);
+    expect(result).toBe(40);
+  });
+
+  // should return the "fullHouse" score (25) if the yatzy field is not taken
   it("should return 25", () => {
     const result = ScoreSheet.getScore(false, "fullHouse", [1, 2, 1, 2, 1]);
     expect(result).toBe(25);
   });
 
-  // should return the highest score of "fullHouse" if the yatzy field is already taken
+  // should return 25 if the yatzy field is already taken
   it("should return 25", () => {
     const result = ScoreSheet.getScore(true, "fullHouse", [1, 1, 1, 1, 1]);
     expect(result).toBe(25);
@@ -148,5 +168,72 @@ describe("getRandomInt()", () => {
     const result = ScoreSheet.getRandomInt(1, 6);
     expect(result).toBeGreaterThanOrEqual(1);
     expect(result).toBeLessThanOrEqual(6);
+  });
+});
+
+describe("getHighestPossibleScoreForField()", () => {
+  it("should return 5", () => {
+    const result = ScoreSheet.getHighestPossibleScoreForField("ones");
+    expect(result).toBe(5);
+  });
+
+  it("should return 10", () => {
+    const result = ScoreSheet.getHighestPossibleScoreForField("twos");
+    expect(result).toBe(10);
+  });
+
+  it("should return 15", () => {
+    const result = ScoreSheet.getHighestPossibleScoreForField("threes");
+    expect(result).toBe(15);
+  });
+
+  it("should return 20", () => {
+    const result = ScoreSheet.getHighestPossibleScoreForField("fours");
+    expect(result).toBe(20);
+  });
+
+  it("should return 25", () => {
+    const result = ScoreSheet.getHighestPossibleScoreForField("fives");
+    expect(result).toBe(25);
+  });
+
+  it("should return 30", () => {
+    const result = ScoreSheet.getHighestPossibleScoreForField("sixes");
+    expect(result).toBe(30);
+  });
+
+  it("should return 30", () => {
+    const result = ScoreSheet.getHighestPossibleScoreForField("threeOfAKind");
+    expect(result).toBe(30);
+  });
+
+  it("should return 30", () => {
+    const result = ScoreSheet.getHighestPossibleScoreForField("fourOfAKind");
+    expect(result).toBe(30);
+  });
+
+  it("should return 25", () => {
+    const result = ScoreSheet.getHighestPossibleScoreForField("fullHouse");
+    expect(result).toBe(25);
+  });
+
+  it("should return 30", () => {
+    const result = ScoreSheet.getHighestPossibleScoreForField("smallStraight");
+    expect(result).toBe(30);
+  });
+
+  it("should return 40", () => {
+    const result = ScoreSheet.getHighestPossibleScoreForField("largeStraight");
+    expect(result).toBe(40);
+  });
+
+  it("should return 30", () => {
+    const result = ScoreSheet.getHighestPossibleScoreForField("chance");
+    expect(result).toBe(30);
+  });
+
+  it("should return 0", () => {
+    const result = ScoreSheet.getHighestPossibleScoreForField("foo");
+    expect(result).toBe(0);
   });
 });
