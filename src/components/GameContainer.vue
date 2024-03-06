@@ -165,12 +165,6 @@ const scoreSheetContainer = ref(null);
 
 // roll the dice when pressing enter
 onMounted(() => {
-  window.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      rollTheDice();
-    }
-  });
-
   isAddPlayersDialogOpen.value = true;
 });
 
