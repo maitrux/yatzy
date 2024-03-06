@@ -45,7 +45,7 @@
           <v-btn
             class="mt-4"
             color="primary"
-            @click="getTotalScore(playerAndScore)"
+            @click="getPlayerTotalScore(playerAndScore)"
           >
             Count total
           </v-btn>
@@ -155,22 +155,22 @@ const saveScore = (selectedField) => {
   emit("swithPlayer");
 };
 
-const getTotalScore = (playerAndScore) => {
-  const totalOfAllFields = ScoreSheet.getSumOfScores(playerAndScore.scores);
+const getPlayerTotalScore = (playerAndScore) => {
+  const scoresOfAllFields = Object.values(playerAndScore.scores);
 
   const numberFields = ["ones", "twos", "threes", "fours", "fives", "sixes"];
 
-  // map all the number field values to an array of numbers
-  const numberFieldValues = numberFields.map(
+  const scoresOfNumberFields = numberFields.map(
     (field) => playerAndScore.scores[field]
   );
 
-  const totalOfNumberFields = ScoreSheet.getSumOfScores(numberFieldValues);
+  const totalOfNumberFields = ScoreSheet.getSumOfScores(scoresOfNumberFields);
 
   playerAndScore.bonus = totalOfNumberFields >= 63 ? 35 : 0;
+
   playerAndScore.total = ScoreSheet.getTotalScore(
-    totalOfAllFields,
-    totalOfNumberFields
+    scoresOfAllFields,
+    scoresOfNumberFields
   );
 };
 
