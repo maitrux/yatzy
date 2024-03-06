@@ -45,7 +45,7 @@
           <v-btn
             class="mt-4"
             color="primary"
-            @click="getPlayerTotalScore(playerAndScore)"
+            @click="getPlayerScore(playerAndScore)"
           >
             Count total
           </v-btn>
@@ -97,6 +97,7 @@ const props = defineProps({
   numberOfPlayers: Number,
   currentPlayer: Object,
   dice: Array,
+  numberOfRolls: Number,
 });
 
 const emit = defineEmits(["swithPlayer"]);
@@ -155,7 +156,7 @@ const saveScore = (selectedField) => {
   emit("swithPlayer");
 };
 
-const getPlayerTotalScore = (playerAndScore) => {
+const getPlayerScore = (playerAndScore) => {
   const scoresOfAllFields = Object.values(playerAndScore.scores);
 
   const numberFields = ["ones", "twos", "threes", "fours", "fives", "sixes"];
