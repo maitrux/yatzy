@@ -1,6 +1,9 @@
 # Yatzy Game (Vue 3)
 Welcome to the digital version of the Yatzy game, thas I developer as a free-time project using Vue 3 and the Composition API. This game offers a responsive and enjoyable experience, playable on both mobile and desktop devices. You can enjoy it in single-player mode or challenge your friends in multiplayer mode!
 
+<img width="719" alt="image" src="https://github.com/user-attachments/assets/813d1b63-05de-4b96-b380-8899ece4c0fb" />
+
+
 ## Features
 Single-player
 
