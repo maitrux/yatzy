@@ -17,5 +17,10 @@ Composition API: For a more modular and readable code structure.
 
 CSS: For styling and ensuring a responsive layout.
 
+Jest: For test coverage. 
+
+<img width="589" alt="image" src="https://github.com/user-attachments/assets/016d56b3-9c3b-4fa2-bcdd-eb73626593c2" />
+
+
 ## Wanna try it out?
 https://maitrux.github.io/yatzy/
