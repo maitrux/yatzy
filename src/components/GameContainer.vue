@@ -1,5 +1,6 @@
 <template>
   <div class="app-container">
+    <div>TEST</div>
     <v-row :justify-sm="players.length % 2 !== 0 ? 'space-between' : 'start'">
       <v-col
         xs="12"
