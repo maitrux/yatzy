@@ -134,11 +134,12 @@ const toCamelCase = (string: string): string => {
 
 const saveScore = (selectedField: string) => {
   const currentPlayerAndScore = playersAndScores.value.find(
-    (playerAndScore) => playerAndScore.name === props.currentPlayer?.name
+    (playerAndScore: Player) =>
+      playerAndScore.name === props.currentPlayer?.name
   );
   if (!currentPlayerAndScore) return;
 
-  const diceValues = props.dice.map((die) => die.value);
+  const diceValues = props.dice.map((die: { value: number }) => die.value);
   const isYatzyFieldFilled = currentPlayerAndScore.scores.yatzy !== null;
 
   const fieldKey = toCamelCase(selectedField) as keyof Scores;
@@ -209,7 +210,7 @@ const generatePlayersAndScores = (numberOfPlayers: number): void => {
 };
 
 const resetScoreSheets = (): void => {
-  playersAndScores.value.forEach((playerAndScore) => {
+  playersAndScores.value.forEach((playerAndScore: Player) => {
     for (const score in playerAndScore.scores) {
       playerAndScore.scores[score as keyof Scores] = null;
     }
@@ -220,12 +221,13 @@ const resetScoreSheets = (): void => {
 
 const showYatzyDialogIfYatzy = (): void => {
   const currentPlayerAndScore = playersAndScores.value.find(
-    (playerAndScore) => playerAndScore.name === props.currentPlayer?.name
+    (playerAndScore: Player) =>
+      playerAndScore.name === props.currentPlayer?.name
   );
 
   if (!currentPlayerAndScore) return;
 
-  const diceValues = props.dice.map((die) => die.value);
+  const diceValues = props.dice.map((die: { value: number }) => die.value);
 
   if (ScoreSheet.isYatzy(diceValues)) {
     isYatzyDialogOpen.value = true;

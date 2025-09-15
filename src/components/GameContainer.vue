@@ -228,11 +228,11 @@ const onSwitchPlayer = (): void => {
 
 const rollTheDice = (): void => {
   if (numberOfRolls.value === 0 || selectedDice.value.length === 0) {
-    dice.value.forEach((die) => {
+    dice.value.forEach((die: { value: number }) => {
       die.value = ScoreSheet.getRandomInt(1, 6);
     });
   } else {
-    selectedDice.value.forEach((i) => {
+    selectedDice.value.forEach((i: number) => {
       dice.value[i].value = ScoreSheet.getRandomInt(1, 6);
     });
   }
