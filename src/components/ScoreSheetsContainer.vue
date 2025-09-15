@@ -26,7 +26,7 @@
               icon="mdi-plus"
               color="primary"
               :disabled="
-                playerAndScore.name !== props.currentPlayer.name ||
+                playerAndScore.name !== props.currentPlayer?.name ||
                 props.numberOfRolls === 0
               "
               @click="saveScore(field)"
@@ -89,22 +89,23 @@
   </v-dialog>
 </template>
 
-<script setup>
-import { ref, defineProps, defineEmits, defineExpose } from "vue";
-import { ScoreSheet } from "../ScoreSheet.ts";
+<script setup lang="ts">
+import { ScoreSheet } from "@/ScoreSheet";
+import { Player, Scores } from "@/Types.js";
+import { defineEmits, defineExpose, defineProps, ref } from "vue";
 
-const props = defineProps({
-  numberOfPlayers: Number,
-  currentPlayer: Object,
-  dice: Array,
-  numberOfRolls: Number,
-});
+const props = defineProps<{
+  numberOfPlayers: number;
+  currentPlayer: Player | null;
+  dice: { value: number }[];
+  numberOfRolls: number;
+}>();
 
 const emit = defineEmits(["swithPlayer"]);
 
-const playersAndScores = ref([]);
+const playersAndScores = ref<Player[]>([]);
 
-const fieldsAsTitles = {
+const fieldsAsTitles: Record<keyof Scores, string> = {
   ones: "Ones (1 for each)",
   twos: "Twos (2 for each)",
   threes: "Threes (3 for each)",
@@ -121,48 +122,45 @@ const fieldsAsTitles = {
 };
 
 const isYatzyDialogOpen = ref(false);
-
 const yatzyDialogText = ref("");
 
-const mapFieldToTitle = (field) => {
+const mapFieldToTitle = (field: keyof Scores): string => {
   return fieldsAsTitles[field];
 };
 
-// return string to camel case but with first letter not capitalized
-const toCamelCase = (string) => {
-  return string.replace(/\s(\w)/g, (_, char) => char.toUpperCase());
+const toCamelCase = (string: string): string => {
+  return string.replace(/\s(\w)/g, (_, char: string) => char.toUpperCase());
 };
 
-const saveScore = (selectedField) => {
-  // find the player in the playersAndScores array
+const saveScore = (selectedField: string) => {
   const currentPlayerAndScore = playersAndScores.value.find(
-    (playerAndScore) => playerAndScore.name === props.currentPlayer.name
+    (playerAndScore) => playerAndScore.name === props.currentPlayer?.name
   );
-
-  let score = 0;
-
-  // key in the score object. e.g., 'ones', 'twos', 'twoPairs, 'threeOfAKind' etc.
-  const fieldKey = toCamelCase(selectedField);
+  if (!currentPlayerAndScore) return;
 
   const diceValues = props.dice.map((die) => die.value);
-
   const isYatzyFieldFilled = currentPlayerAndScore.scores.yatzy !== null;
 
-  score = ScoreSheet.getScore(isYatzyFieldFilled, fieldKey, diceValues);
+  const fieldKey = toCamelCase(selectedField) as keyof Scores;
+  const score = ScoreSheet.getScore(isYatzyFieldFilled, fieldKey, diceValues);
 
-  // update the score of the current player. the selected score saving field is the key of the score object
   currentPlayerAndScore.scores[fieldKey] = score;
 
   emit("swithPlayer");
 };
 
-const getPlayerScore = (playerAndScore) => {
-  const scoresOfAllFields = Object.values(playerAndScore.scores);
-
-  const numberFields = ["ones", "twos", "threes", "fours", "fives", "sixes"];
+const getPlayerScore = (playerAndScore: Player) => {
+  const numberFields: (keyof Scores)[] = [
+    "ones",
+    "twos",
+    "threes",
+    "fours",
+    "fives",
+    "sixes",
+  ];
 
   const scoresOfNumberFields = numberFields.map(
-    (field) => playerAndScore.scores[field]
+    (field) => playerAndScore.scores[field] ?? 0
   );
 
   const totalOfNumberFields = ScoreSheet.getSumOfScores(scoresOfNumberFields);
@@ -170,26 +168,21 @@ const getPlayerScore = (playerAndScore) => {
   playerAndScore.bonus = totalOfNumberFields >= 63 ? 35 : 0;
 
   playerAndScore.total = ScoreSheet.getTotalScore(
-    scoresOfAllFields,
+    Object.values(playerAndScore.scores).map((s) => s ?? 0),
     scoresOfNumberFields
   );
 };
 
-const areAllFieldsFilled = (playerAndScore) => {
-  for (const score in playerAndScore.scores) {
-    if (playerAndScore.scores[score] === null) {
-      return false;
-    }
-  }
-
-  return true;
+const areAllFieldsFilled = (playerAndScore: Player): boolean => {
+  return Object.values(playerAndScore.scores).every((score) => score !== null);
 };
 
-const generatePlayersAndScores = (numberOfPlayers) => {
-  const playersAndScoresArray = [];
+const generatePlayersAndScores = (numberOfPlayers: number): void => {
+  const playersAndScoresArray: Player[] = [];
   for (let i = 1; i <= numberOfPlayers; i++) {
-    const player = {
+    const player: Player = {
       name: `Player ${i}`,
+      turn: i === 1,
       scores: {
         ones: null,
         twos: null,
@@ -215,26 +208,27 @@ const generatePlayersAndScores = (numberOfPlayers) => {
   playersAndScores.value = playersAndScoresArray;
 };
 
-const resetScoreSheets = () => {
+const resetScoreSheets = (): void => {
   playersAndScores.value.forEach((playerAndScore) => {
     for (const score in playerAndScore.scores) {
-      playerAndScore.scores[score] = null;
+      playerAndScore.scores[score as keyof Scores] = null;
     }
     playerAndScore.bonus = 0;
     playerAndScore.total = 0;
   });
 };
 
-const showYatzyDialogIfYatzy = () => {
+const showYatzyDialogIfYatzy = (): void => {
   const currentPlayerAndScore = playersAndScores.value.find(
-    (playerAndScore) => playerAndScore.name === props.currentPlayer.name
+    (playerAndScore) => playerAndScore.name === props.currentPlayer?.name
   );
+
+  if (!currentPlayerAndScore) return;
 
   const diceValues = props.dice.map((die) => die.value);
 
   if (ScoreSheet.isYatzy(diceValues)) {
     isYatzyDialogOpen.value = true;
-
     setTimeout(() => {
       isYatzyDialogOpen.value = false;
     }, 2000);

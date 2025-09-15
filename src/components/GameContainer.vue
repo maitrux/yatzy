@@ -140,58 +140,74 @@
   </div>
 </template>
 
-<script setup>
-import { ref, onMounted } from "vue";
+<script setup lang="ts">
+import { ScoreSheet } from "@/ScoreSheet";
+import { Die, Player } from "@/Types";
+import { onMounted, ref } from "vue";
 import ScoreSheetsContainer from "./ScoreSheetsContainer.vue";
-import { ScoreSheet } from "../ScoreSheet.ts";
 
-const players = ref([]);
+const players = ref<Player[]>([]);
 
-const currentPlayer = ref(players.value[0]);
+const currentPlayer = ref<Player | null>(null);
 
-const numberOfRolls = ref(0);
+const numberOfRolls = ref<number>(0);
 
-const dice = [ref(0), ref(0), ref(0), ref(0), ref(0)];
+const dice = ref<Die[]>([ref(0), ref(0), ref(0), ref(0), ref(0)]);
 
-const selectedDice = ref([]);
+const selectedDice = ref<number[]>([]);
 
-const expand = ref(false);
+const expand = ref<boolean>(false);
 
-const isAddPlayersDialogOpen = ref(false);
+const isAddPlayersDialogOpen = ref<boolean>(false);
 
-const numberOfPlayers = ref(1);
+const numberOfPlayers = ref<number>(1);
 
 // ref to the DOM element of the child component
-const scoreSheetContainer = ref(null);
+const scoreSheetContainer = ref<InstanceType<
+  typeof ScoreSheetsContainer
+> | null>(null);
 
 // roll the dice when pressing enter
 onMounted(() => {
   isAddPlayersDialogOpen.value = true;
 });
 
-const addPlayers = () => {
-  // Clear existing players
+const addPlayers = (): void => {
   players.value = [];
 
-  // Add new players based on numberOfPlayers
   for (let i = 0; i < numberOfPlayers.value; i++) {
     players.value.push({
       name: `Player ${i + 1}`,
-      turn: i === 0, // Set first player's turn to true
+      turn: i === 0,
+      scores: {
+        ones: null,
+        twos: null,
+        threes: null,
+        fours: null,
+        fives: null,
+        sixes: null,
+        threeOfAKind: null,
+        fourOfAKind: null,
+        fullHouse: null,
+        smallStraight: null,
+        largeStraight: null,
+        chance: null,
+        yatzy: null,
+      },
+      bonus: 0,
+      total: 0,
     });
   }
 
-  scoreSheetContainer.value.generatePlayersAndScores(numberOfPlayers.value);
+  scoreSheetContainer.value?.generatePlayersAndScores(numberOfPlayers.value);
 
-  // Set currentPlayer to the first player
-  currentPlayer.value = players.value[0];
-
-  // Close the dialog
+  currentPlayer.value = players.value[0] ?? null;
   isAddPlayersDialogOpen.value = false;
 };
 
-const onSwitchPlayer = () => {
-  // find next player in the array
+const onSwitchPlayer = (): void => {
+  if (!currentPlayer.value) return;
+
   const nextPlayer =
     players.value[
       (players.value.indexOf(currentPlayer.value) + 1) % players.value.length
@@ -200,56 +216,50 @@ const onSwitchPlayer = () => {
   currentPlayer.value = nextPlayer;
   numberOfRolls.value = 0;
 
-  // switch turn to next player
   currentPlayer.value.turn = true;
   players.value.forEach((player) => {
-    if (player.name !== currentPlayer.value.name) {
+    if (player.name !== currentPlayer.value?.name) {
       player.turn = false;
     }
   });
 
-  // reset dice and number of rolls in the end of the turn
   resetDiceAndNumOfRolls();
 };
 
-const rollTheDice = () => {
-  // if first roll, roll all dice
+const rollTheDice = (): void => {
   if (numberOfRolls.value === 0 || selectedDice.value.length === 0) {
-    dice.forEach((die) => {
+    dice.value.forEach((die) => {
       die.value = ScoreSheet.getRandomInt(1, 6);
     });
   } else {
-    // roll only the selected dice
     selectedDice.value.forEach((i) => {
-      dice[i].value = ScoreSheet.getRandomInt(1, 6);
+      dice.value[i].value = ScoreSheet.getRandomInt(1, 6);
     });
   }
 
-  // check if yatzy and show the dialog if it is
-  scoreSheetContainer.value.showYatzyDialogIfYatzy();
+  scoreSheetContainer.value?.showYatzyDialogIfYatzy();
 
   numberOfRolls.value++;
   selectedDice.value = [];
 };
 
-const resetGame = () => {
-  // reset dice and number of rolls
+const resetGame = (): void => {
   resetDiceAndNumOfRolls();
 
-  // reset players
   players.value.forEach((player) => {
     player.turn = false;
   });
 
-  players.value[0].turn = true;
-  currentPlayer.value = players.value[0];
+  if (players.value.length) {
+    players.value[0].turn = true;
+    currentPlayer.value = players.value[0];
+  }
 
-  // reset the score sheets
-  scoreSheetContainer.value.resetScoreSheets();
+  scoreSheetContainer.value?.resetScoreSheets();
 };
 
-const resetDiceAndNumOfRolls = () => {
-  dice.forEach((die) => (die.value = 0));
+const resetDiceAndNumOfRolls = (): void => {
+  dice.value.forEach((die) => (die.value = 0));
   numberOfRolls.value = 0;
   selectedDice.value = [];
 };
