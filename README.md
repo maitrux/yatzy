@@ -32,9 +32,9 @@ This project is built with **Vue 3**, **TypeScript**, and **Vuetify**, with **Je
 <img width="676" height="193" alt="image" src="https://github.com/user-attachments/assets/f70bd78c-1cf6-482f-a417-5f7b849cea29" />
 
 ## ✨ Improvement ideas
-🎮 Multi-device gameplay: Allow players to join the same game from different devices in real time.
-💾 Persistent game data: Store scores, game state, and history in a database.
-⚡ Real-time updates: Use for example WebSocketsto sync game state across devices.
+- 🎮 Multi-device gameplay: Allow players to join the same game from different devices in real time.
+- 💾 Persistent game data: Store scores, game state, and history in a database.
+- ⚡ Real-time updates: Use for example WebSocketsto sync game state across devices.
 
 These improvements would make Yatzy more interactive, social, and engaging for players.
 
