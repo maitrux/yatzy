@@ -40,5 +40,10 @@ These improvements would make Yatzy more interactive, social, and engaging for p
 
 ---
 
+## 🎲 Try it out! 
+[![Yatzy](https://img.shields.io/badge/https%3A%2F%2Fmaitrux.github.io%2Fyatzy-blue?style=flat-square)](https://maitrux.github.io/yatzy/)
+
+---
+
 ## 🤝 Feedback
 Any feedback and feature requests are welcome!
